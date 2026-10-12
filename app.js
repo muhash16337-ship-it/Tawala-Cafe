@@ -127,6 +127,73 @@ function formatMenuPrice(price) {
   return `KSh ${new Intl.NumberFormat("en-KE").format(price)}`;
 }
 
+function buildOrderMessage(items, details = {}) {
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error("Cannot build an order message without any items.");
+  }
+
+  const lines = [
+    "*TAWALA CAFÉ ORDER* 🍽️",
+    `Order No: TC-${String(Date.now()).slice(-4).padStart(4, "0")}`,
+    ""
+  ];
+  const orderType = String(details.orderType ?? "").trim();
+  const tableNumber = String(details.tableNumber ?? "").trim();
+  const name = String(details.name ?? "").trim();
+  const location = String(details.location ?? "").trim();
+  const instructions = String(details.specialInstructions ?? "").trim();
+  let total = 0;
+
+  items.forEach((item) => {
+    const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
+    const price = Number(item.price);
+    const itemName = String(item.name ?? "").trim();
+    const option = String(item.option ?? "").trim();
+    if (!Number.isFinite(price) || price < 0) {
+      throw new Error(`Invalid order price for ${itemName || "menu item"}.`);
+    }
+    if (!itemName) {
+      throw new Error("An order item is missing its name.");
+    }
+
+    const displayName = option ? `${itemName}, ${option}` : itemName;
+    total += price * quantity;
+    lines.push(`• ${displayName} (${quantity}) — ${formatMenuPrice(price * quantity)}`);
+
+    const itemNote = String(item.note ?? item.specialInstructions ?? "").trim();
+    if (itemNote) {
+      lines.push(`   Note: ${itemNote}`);
+    }
+  });
+
+  if (instructions) {
+    lines.push(`   Note: ${instructions}`);
+  }
+
+  lines.push("", `💰 *Total: ${formatMenuPrice(total)}*`);
+  if (orderType) {
+    const normalizedType = orderType.toLowerCase();
+    const typeLabel = normalizedType === "dine in" && tableNumber
+      ? `Dine in (Table ${tableNumber})`
+      : orderType;
+    lines.push("", `📍 ${typeLabel}`);
+    if (name) {
+      lines.push(`👤 ${name}`);
+    }
+    if (normalizedType === "delivery" && location) {
+      lines.push(`📌 ${location}`);
+    }
+  }
+
+  const payment = !orderType
+    ? "at the counter or on delivery"
+    : orderType.toLowerCase() === "delivery"
+      ? "on delivery"
+      : "at the counter";
+  lines.push(`💳 ${payment}`);
+  return lines.join("\n");
+}
+
 function buildWhatsAppLink(orderItems, customerDetails = {}) {
   const number = cleanWhatsAppNumber(CONFIG.whatsappNumber);
   if (!number) {
@@ -136,64 +203,7 @@ function buildWhatsAppLink(orderItems, customerDetails = {}) {
     return null;
   }
 
-  const lines = ["Hello Tawala Café, I would like to place an order."];
-  const detailLines = [];
-  const orderType = String(customerDetails.orderType ?? "").trim();
-  const tableNumber = String(customerDetails.tableNumber ?? "").trim();
-  const name = String(customerDetails.name ?? "").trim();
-  const location = String(customerDetails.location ?? "").trim();
-  const instructions = String(customerDetails.specialInstructions ?? "").trim();
-  const total = orderItems.reduce((sum, item) => {
-    const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
-    const price = Number(item.price);
-    if (!Number.isFinite(price) || price < 0) {
-      throw new Error(`Invalid order price for ${item.name || "menu item"}.`);
-    }
-    return sum + price * quantity;
-  }, 0);
-
-  if (orderType) {
-    const normalizedType = orderType.toLowerCase();
-    const typeLabel = normalizedType === "dine in" && tableNumber
-      ? `Dine in (Table ${tableNumber})`
-      : orderType;
-    detailLines.push(`Order type: ${typeLabel}`);
-  }
-  if (name) {
-    detailLines.push(`Name: ${name}`);
-  }
-  if (location) {
-    detailLines.push(`Location: ${location}`);
-  }
-  if (detailLines.length) {
-    lines.push("", ...detailLines);
-  }
-
-  lines.push("");
-  orderItems.forEach((item, index) => {
-    const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
-    const price = Number(item.price);
-    const itemName = String(item.name ?? "").trim();
-    const option = String(item.option ?? "").trim();
-    if (!itemName) {
-      throw new Error("An order item is missing its name.");
-    }
-    const displayName = option ? `${itemName}, ${option}` : itemName;
-    const lineTotal = price * quantity;
-    lines.push(`${index + 1}. ${quantity} x ${displayName} (${formatMenuPrice(price)} each) = ${formatMenuPrice(lineTotal)}`);
-  });
-
-  if (instructions) {
-    lines.push("", `Special instructions: ${instructions}`);
-  }
-  lines.push(
-    `Total: ${formatMenuPrice(total)}`,
-    "Payment: at the counter or on delivery.",
-    "",
-    "Please confirm my order. Thank you!"
-  );
-
-  const message = lines.join("\n");
+  const message = buildOrderMessage(orderItems, customerDetails);
   return {
     number,
     message,
