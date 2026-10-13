@@ -630,26 +630,71 @@ const orderCopy = document.querySelector("#order-copy");
 const orderCopied = document.querySelector("#order-copied");
 const orderClear = document.querySelector("#order-clear");
 const orderNew = document.querySelector("#order-new");
-const orderStorageKey = "tawala-cafe-order";
-let orderItems = [];
+const CART_STORAGE_KEY = "tawala-cafe-order";
+const CART_EXPIRY_MS = 2 * 60 * 60 * 1000;
 let orderWhatsAppMessage = "";
 
 try {
-  const storedOrder = JSON.parse(localStorage.getItem(orderStorageKey) ?? "[]");
-  if (Array.isArray(storedOrder)) {
-    orderItems = storedOrder.flatMap((storedLine) => {
-      const item = menuItems.find((menuItem) => menuItem.id === storedLine.id);
-      const quantity = Number(storedLine.quantity);
-      const option = String(storedLine.option ?? "");
+  localStorage.removeItem(CART_STORAGE_KEY); // TODO: This legacy cleanup line can be removed after existing carts are cleared.
+} catch (error) {
+  console.warn("Unable to remove the old saved Tawala Café order.", error);
+}
+
+function loadCart() {
+  try {
+    const savedCart = sessionStorage.getItem(CART_STORAGE_KEY);
+    if (!savedCart) {
+      return [];
+    }
+
+    const parsedCart = JSON.parse(savedCart);
+    if (
+      !parsedCart ||
+      !Array.isArray(parsedCart.items) ||
+      !Number.isFinite(parsedCart.savedAt)
+    ) {
+      clearCart();
+      return [];
+    }
+
+    if (Date.now() - parsedCart.savedAt > CART_EXPIRY_MS || parsedCart.savedAt > Date.now()) {
+      clearCart();
+      return [];
+    }
+
+    return parsedCart.items.flatMap((storedLine) => {
+      const item = menuItems.find((menuItem) => menuItem.id === storedLine?.id);
+      const quantity = Number(storedLine?.quantity);
+      const option = String(storedLine?.option ?? "");
       const validOption = !option || item?.options?.some((itemOption) => itemOption.label === option);
       return item && Number.isInteger(quantity) && quantity >= 1 && quantity <= 20 && validOption
         ? [{ id: item.id, option, quantity }]
         : [];
     });
+  } catch (error) {
+    console.warn("Unable to restore the saved Tawala Café order.", error);
+    clearCart();
+    return [];
   }
-} catch (error) {
-  console.warn("Unable to restore the saved Tawala Café order.", error);
 }
+
+function saveCart(cart) {
+  try {
+    sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ items: cart, savedAt: Date.now() }));
+  } catch (error) {
+    console.warn("Unable to save the Tawala Café order in this browser session.", error);
+  }
+}
+
+function clearCart() {
+  try {
+    sessionStorage.removeItem(CART_STORAGE_KEY);
+  } catch (error) {
+    console.warn("Unable to clear the Tawala Café order from this browser session.", error);
+  }
+}
+
+let orderItems = loadCart();
 
 function getOrderLineDetails(line) {
   const item = menuItems.find((menuItem) => menuItem.id === line.id);
@@ -663,14 +708,6 @@ function getOrderLineDetails(line) {
     quantity: line.quantity,
     price: option?.price ?? item.price
   };
-}
-
-function saveOrder() {
-  try {
-    localStorage.setItem(orderStorageKey, JSON.stringify(orderItems));
-  } catch (error) {
-    console.warn("Unable to save the Tawala Café order in this browser.", error);
-  }
 }
 
 function renderOrder() {
@@ -738,7 +775,7 @@ function addActiveDishToOrder(closeDialog = true) {
   } else {
     orderItems.push({ id: activeDish.id, option, quantity: activeDishQuantity });
   }
-  saveOrder();
+  saveCart(orderItems);
   renderOrder();
   if (closeDialog) {
     dishDialog.close();
@@ -746,7 +783,6 @@ function addActiveDishToOrder(closeDialog = true) {
 }
 
 function openWhatsAppLink(url, fallback, fallbackLink) {
-  console.log("Tawala Café WhatsApp order link:", url);
   fallbackLink.href = url;
   fallback.hidden = false;
   if (window.matchMedia("(max-width: 767px), (pointer: coarse)").matches) {
@@ -1375,14 +1411,38 @@ orderDialogItems.addEventListener("click", (event) => {
   } else if (button.dataset.orderAction === "increase") {
     line.quantity = Math.min(20, line.quantity + 1);
   }
-  saveOrder();
+  saveCart(orderItems);
   renderOrder();
 });
 
 orderType.addEventListener("change", () => {
-  orderTableField.hidden = orderType.value !== "Dine in";
-  orderLocationField.hidden = orderType.value !== "Delivery";
+  syncOrderTypeToggle();
+  sessionStorage.setItem("tawala-order-type", orderType.value);
+  if (orderType.value !== "Delivery") {
+    orderLocationField.classList.remove("is-invalid");
+    orderEmptyMessage.hidden = true;
+  }
 });
+
+orderCustomerName.addEventListener("input", () => {
+  sessionStorage.setItem("tawala-order-name", orderCustomerName.value);
+});
+
+orderTypeOptions.forEach((button) => {
+  button.addEventListener("click", () => {
+    orderType.value = button.dataset.orderTypeOption;
+    orderType.dispatchEvent(new Event("change"));
+  });
+});
+
+orderLocation.addEventListener("input", () => {
+  if (orderType.value === "Delivery") {
+    orderLocationField.classList.remove("is-invalid");
+    orderEmptyMessage.hidden = true;
+  }
+});
+
+syncOrderTypeToggle();
 
 orderSendWhatsApp.addEventListener("click", () => {
   if (!orderItems.length) {
@@ -1393,6 +1453,7 @@ orderSendWhatsApp.addEventListener("click", () => {
   if (orderType.value === "Delivery" && !orderLocation.value.trim()) {
     orderEmptyMessage.textContent = "Enter your delivery location to continue.";
     orderEmptyMessage.hidden = false;
+    orderLocationField.classList.add("is-invalid");
     orderLocation.focus();
     return;
   }
@@ -1404,6 +1465,9 @@ orderSendWhatsApp.addEventListener("click", () => {
     orderCopied.hidden = true;
     orderNew.hidden = false;
     openWhatsAppLink(order.url, orderWhatsAppFallback, orderFallbackLink);
+    orderItems = [];
+    clearCart();
+    renderOrder();
   } catch (error) {
     orderEmptyMessage.textContent = "Unable to prepare this order. Please try again.";
     orderEmptyMessage.hidden = false;
@@ -1426,7 +1490,7 @@ orderCopy.addEventListener("click", () => {
 
 orderClear.addEventListener("click", () => {
   orderItems = [];
-  saveOrder();
+  clearCart();
   renderOrder();
   orderWhatsAppFallback.hidden = true;
   orderNew.hidden = true;
@@ -1434,7 +1498,7 @@ orderClear.addEventListener("click", () => {
 
 orderNew.addEventListener("click", () => {
   orderItems = [];
-  saveOrder();
+  clearCart();
   renderOrder();
   orderWhatsAppFallback.hidden = true;
   orderNew.hidden = true;
@@ -1445,6 +1509,13 @@ orderNew.addEventListener("click", () => {
   orderInstructions.value = "";
   orderTableField.hidden = false;
   orderLocationField.hidden = true;
+});
+
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    orderItems = loadCart();
+    renderOrder();
+  }
 });
 
 let dishTouchStartY = null;
