@@ -754,10 +754,147 @@ function openWhatsAppLink(url, fallback, fallbackLink) {
     return;
   }
 
-  const openedWindow = window.open(url, "_blank", "noopener");
+  const openedWindow = window.open(url, "_blank");
   if (!openedWindow) {
     window.location.href = url;
+    return;
   }
+  openedWindow.opener = null;
+}
+
+function syncOrderTypeToggle() {
+  const activeType = orderType.value;
+  orderTypeOptions.forEach((button) => {
+    const isActive = button.dataset.orderTypeOption === activeType;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  const activeIndex = ["Dine in", "Pickup", "Delivery"].indexOf(activeType);
+  if (orderTypeToggle && activeIndex >= 0) {
+    orderTypeToggle.style.setProperty("--active-index", String(activeIndex));
+  }
+
+  const isDining = orderType.value === "Dine in";
+  const isDelivery = orderType.value === "Delivery";
+  orderTableField.classList.toggle("is-hidden", !isDining);
+  orderLocationField.classList.toggle("is-hidden", !isDelivery);
+  orderTableField.setAttribute("aria-hidden", String(!isDining));
+  orderLocationField.setAttribute("aria-hidden", String(!isDelivery));
+  orderTableField.querySelector("input").disabled = !isDining;
+  orderLocationField.querySelector("input").disabled = !isDelivery;
+}
+
+function syncModalBodyLock() {
+  const anyDialogOpen = document.querySelector("dialog[open]");
+  document.body.classList.toggle("modal-open", Boolean(anyDialogOpen));
+}
+
+function askCartChoice({ dishName, dishPrice, cartCount, cartTotal }) {
+  cartChoiceCartSummary.textContent = `${cartCount} ${cartCount === 1 ? "item" : "items"} · ${formatMenuPrice(cartTotal)}`;
+  cartChoiceDishSummary.textContent = `${dishName} · ${formatMenuPrice(dishPrice)}`;
+  cartChoiceCombinedTotal.textContent = formatMenuPrice(cartTotal + dishPrice);
+  cartChoiceStepOne.classList.add("is-active");
+  cartChoiceStepTwo.classList.remove("is-active");
+  cartChoiceStepOne.removeAttribute("inert");
+  cartChoiceStepOne.setAttribute("aria-hidden", "false");
+  cartChoiceStepTwo.setAttribute("inert", "");
+  cartChoiceStepTwo.setAttribute("aria-hidden", "true");
+  cartChoiceSteps.classList.remove("cart-choice-dialog__steps--details");
+  cartChoiceFallback.hidden = true;
+  cartChoiceValidation.hidden = true;
+  cartChoiceLocation.classList.remove("is-invalid");
+  cartChoiceSend.classList.remove("is-sending", "is-sent");
+  cartChoiceDialog.querySelectorAll("[data-cart-choice]").forEach((button) => {
+    button.classList.remove("is-selected");
+    button.setAttribute("aria-pressed", "false");
+  });
+
+  return new Promise((resolve) => {
+    resolveCartChoice = resolve;
+    pendingCartChoice = null;
+    const rememberedType = sessionStorage.getItem("tawala-order-type") || "Delivery";
+    const rememberedName = sessionStorage.getItem("tawala-order-name") || orderCustomerName.value || "";
+    cartChoiceDishOpener = document.activeElement;
+    cartChoiceDialog.setAttribute("aria-labelledby", "cart-choice-title");
+    cartChoiceDialog.setAttribute("aria-describedby", "cart-choice-subtitle");
+    cartChoiceTypeOptions.forEach((button) => {
+      const selected = button.dataset.orderMethod === rememberedType;
+      button.setAttribute("aria-checked", String(selected));
+      button.classList.toggle("is-selected", selected);
+    });
+    cartChoiceName.value = rememberedName;
+    cartChoiceLocation.value = orderLocation.value;
+    cartChoiceNotes.value = orderInstructions.value;
+    cartChoicePickupTime.value = "";
+    cartChoiceTable.value = orderTableNumber.value;
+    updateCartChoiceMethod(rememberedType);
+    cartChoiceDialog.showModal();
+    syncModalBodyLock();
+    cartChoiceDialog.querySelector('[data-cart-choice="add-all"]').focus();
+  });
+}
+
+function updateCartChoiceMethod(type) {
+  cartChoiceTypeOptionGroup.classList.toggle("is-pickup", type === "Pickup");
+  cartChoiceTypeOptionGroup.classList.toggle("is-dine-in", type === "Dine in");
+  cartChoiceTypeOptions.forEach((button) => {
+    const selected = button.dataset.orderMethod === type;
+    button.setAttribute("aria-checked", String(selected));
+    button.classList.toggle("is-selected", selected);
+  });
+  cartChoiceMethodPanels.forEach((panel) => {
+    const selected = panel.dataset.methodPanel === type;
+    panel.hidden = !selected;
+    panel.classList.toggle("is-active", selected);
+  });
+  cartChoiceOrderTypeSummary.textContent = type;
+  orderType.value = type;
+  orderType.dispatchEvent(new Event("change"));
+  cartChoiceValidation.hidden = true;
+  cartChoiceLocation.classList.remove("is-invalid");
+  cartChoiceSend.setAttribute("aria-disabled", String(type === "Delivery" && !cartChoiceLocation.value.trim()));
+}
+
+function showCartChoiceDetails(choice, orderLines) {
+  pendingCartChoice = choice;
+  cartChoiceOrderLines = orderLines;
+  cartChoiceDialog.querySelectorAll("[data-cart-choice]").forEach((button) => {
+    const selected = button.dataset.cartChoice === choice;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  const resolvedLines = orderLines.map(getOrderLineDetails);
+  const totalCount = resolvedLines.reduce((sum, line) => sum + line.quantity, 0);
+  const total = resolvedLines.reduce((sum, line) => sum + line.price * line.quantity, 0);
+  cartChoiceItemsCount.textContent = `${totalCount} ${totalCount === 1 ? "item" : "items"}`;
+  cartChoiceOrderTotal.textContent = formatMenuPrice(total);
+  cartChoiceSteps.classList.add("cart-choice-dialog__steps--details");
+  cartChoiceStepOne.classList.remove("is-active");
+  cartChoiceStepTwo.classList.add("is-active");
+  cartChoiceStepOne.setAttribute("inert", "");
+  cartChoiceStepOne.setAttribute("aria-hidden", "true");
+  cartChoiceStepTwo.removeAttribute("inert");
+  cartChoiceStepTwo.setAttribute("aria-hidden", "false");
+  cartChoiceDialog.setAttribute("aria-labelledby", "cart-details-title");
+  cartChoiceDialog.removeAttribute("aria-describedby");
+  window.setTimeout(() => {
+    if (cartChoiceDialog.open && cartChoiceStepTwo.classList.contains("is-active")) {
+      cartChoiceTypeOptions[0].focus();
+    }
+  }, 350);
+}
+
+function finishCartChoice(result) {
+  if (!resolveCartChoice) {
+    return;
+  }
+  const resolve = resolveCartChoice;
+  resolveCartChoice = null;
+  cartChoiceDialog.close();
+  syncModalBodyLock();
+  cartChoiceDishOpener?.focus();
+  resolve(result);
 }
 
 function readOrderDetails() {
@@ -954,7 +1091,7 @@ dishQuantityPlus.addEventListener("click", () => {
   updateDishDialogPrice();
 });
 
-dishDialogOrder.addEventListener("click", () => {
+dishDialogOrder.addEventListener("click", async () => {
   if (!activeDish || activeDish.available === false) {
     return;
   }
@@ -965,15 +1102,21 @@ dishDialogOrder.addEventListener("click", () => {
     quantity: activeDishQuantity
   }];
   if (orderItems.length > 0) {
-    const addAndSendEverything = window.confirm("Your order already has items. Choose OK to add this dish and send everything, or Cancel to send just this dish.");
-    if (addAndSendEverything) {
-      addActiveDishToOrder(false);
-      lines = orderItems;
-    }
+    const currentCartLines = orderItems.map(getOrderLineDetails);
+    const cartCount = currentCartLines.reduce((sum, line) => sum + line.quantity, 0);
+    const cartTotal = currentCartLines.reduce((sum, line) => sum + line.price * line.quantity, 0);
+    const dishDisplayName = `${activeDish.name}${activeDishOption ? ` (${activeDishOption.label})` : ""}${activeDishQuantity > 1 ? ` × ${activeDishQuantity}` : ""}`;
+    await askCartChoice({
+      dishName: dishDisplayName,
+      dishPrice: activeDishPrice * activeDishQuantity,
+      cartCount,
+      cartTotal
+    });
+    return;
   }
 
   try {
-    const order = getWhatsAppOrder(lines, lines === orderItems ? readOrderDetails() : {});
+    const order = getWhatsAppOrder(lines);
     activeWhatsAppMessage = order.message;
     dishDialogOrderEmpty.hidden = true;
     openWhatsAppLink(order.url, dishDialogFallback, dishDialogFallbackLink);
@@ -981,6 +1124,190 @@ dishDialogOrder.addEventListener("click", () => {
     dishDialogOrderEmpty.textContent = "Unable to prepare this order. Please try again.";
     dishDialogOrderEmpty.hidden = false;
     console.error("Unable to build the WhatsApp order link.", error);
+  }
+});
+
+document.querySelector("#cart-choice-close").addEventListener("click", () => {
+  finishCartChoice({ choice: "cancel" });
+});
+
+cartChoiceDialog.addEventListener("click", (event) => {
+  const choiceButton = event.target.closest("[data-cart-choice]");
+  if (choiceButton) {
+    if (choiceButton.dataset.cartChoice === "cancel") {
+      finishCartChoice({ choice: "cancel" });
+    } else {
+      const activeLine = {
+        id: activeDish.id,
+        option: activeDishOption?.label ?? "",
+        quantity: activeDishQuantity
+      };
+      let selectedLines;
+      if (choiceButton.dataset.cartChoice === "add-all") {
+        const combinedLines = orderItems.map((line) => ({ ...line }));
+        const existingLine = combinedLines.find((line) => line.id === activeLine.id && line.option === activeLine.option);
+        if (existingLine) {
+          existingLine.quantity = Math.min(20, existingLine.quantity + activeLine.quantity);
+        } else {
+          combinedLines.push(activeLine);
+        }
+        selectedLines = combinedLines;
+      } else {
+        selectedLines = [activeLine];
+      }
+      showCartChoiceDetails(choiceButton.dataset.cartChoice, selectedLines);
+    }
+    return;
+  }
+  const typeButton = event.target.closest("[data-order-method]");
+  if (typeButton) {
+    updateCartChoiceMethod(typeButton.dataset.orderMethod);
+    return;
+  }
+  if (event.target === cartChoiceDialog || event.target.classList.contains("dish-dialog__backdrop")) {
+    finishCartChoice({ choice: "cancel" });
+  }
+});
+
+cartChoiceDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  finishCartChoice({ choice: "cancel" });
+});
+
+cartChoiceDialog.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    finishCartChoice({ choice: "cancel" });
+    return;
+  }
+  if (["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(event.key)) {
+    const current = event.target.closest("[data-order-method]");
+    if (!current) return;
+    event.preventDefault();
+    const index = cartChoiceTypeOptions.indexOf(current);
+    const offset = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : -1;
+    const next = cartChoiceTypeOptions[(index + offset + cartChoiceTypeOptions.length) % cartChoiceTypeOptions.length];
+    updateCartChoiceMethod(next.dataset.orderMethod);
+    next.focus();
+  }
+});
+
+cartChoiceBack.addEventListener("click", () => {
+  cartChoiceSteps.classList.remove("cart-choice-dialog__steps--details");
+  cartChoiceStepTwo.classList.remove("is-active");
+  cartChoiceStepOne.classList.add("is-active");
+  cartChoiceStepTwo.setAttribute("inert", "");
+  cartChoiceStepTwo.setAttribute("aria-hidden", "true");
+  cartChoiceStepOne.removeAttribute("inert");
+  cartChoiceStepOne.setAttribute("aria-hidden", "false");
+  cartChoiceDialog.setAttribute("aria-labelledby", "cart-choice-title");
+  cartChoiceDialog.setAttribute("aria-describedby", "cart-choice-subtitle");
+  cartChoiceDialog.querySelector(`[data-cart-choice="${pendingCartChoice}"]`)?.focus();
+});
+
+cartChoiceTypeOptions.forEach((button) => {
+  button.addEventListener("click", () => updateCartChoiceMethod(button.dataset.orderMethod));
+});
+
+[cartChoiceName, cartChoiceLocation, cartChoiceNotes].forEach((field) => {
+  field.addEventListener("input", () => {
+    if (field === cartChoiceName) {
+      sessionStorage.setItem("tawala-order-name", cartChoiceName.value);
+      orderCustomerName.value = cartChoiceName.value;
+    }
+    if (field === cartChoiceLocation) {
+      cartChoiceLocation.classList.remove("is-invalid");
+      cartChoiceValidation.hidden = true;
+      cartChoiceSend.setAttribute("aria-disabled", String(!cartChoiceLocation.value.trim()));
+    }
+  });
+});
+
+cartChoiceSend.addEventListener("click", async () => {
+  if (!cartChoiceStepTwo.classList.contains("is-active")) {
+    return;
+  }
+  const type = cartChoiceTypeOptions.find((button) => button.getAttribute("aria-checked") === "true")?.dataset.orderMethod || "Delivery";
+  if (type === "Delivery" && !cartChoiceLocation.value.trim()) {
+    cartChoiceValidation.hidden = false;
+    cartChoiceLocation.classList.add("is-invalid");
+    cartChoiceLocation.focus();
+    return;
+  }
+  const details = {
+    orderType: type,
+    location: type === "Delivery" ? cartChoiceLocation.value.trim() : "",
+    pickupTime: type === "Pickup" ? cartChoicePickupTime.value : "",
+    tableNumber: type === "Dine in" ? cartChoiceTable.value.trim() : "",
+    name: cartChoiceName.value.trim(),
+    specialInstructions: type === "Delivery" ? cartChoiceNotes.value.trim() : ""
+  };
+  sessionStorage.setItem("tawala-order-type", type);
+  sessionStorage.setItem("tawala-order-name", details.name);
+  orderLocation.value = cartChoiceLocation.value;
+  orderCustomerName.value = details.name;
+  orderTableNumber.value = details.tableNumber;
+  orderInstructions.value = details.specialInstructions;
+  const lines = cartChoiceOrderLines;
+  try {
+    const order = getWhatsAppOrder(lines, details);
+    activeWhatsAppMessage = order.message;
+    cartChoiceFallbackLink.href = order.url;
+    cartChoiceFallback.hidden = false;
+    dishDialogFallbackLink.href = order.url;
+    dishDialogFallback.hidden = false;
+    cartChoiceCopied.hidden = true;
+    cartChoiceSend.classList.add("is-sending");
+    cartChoiceSend.setAttribute("aria-disabled", "true");
+    await new Promise((resolve) => window.setTimeout(resolve, 450));
+    cartChoiceSend.classList.remove("is-sending");
+    cartChoiceSend.classList.add("is-sent");
+    await new Promise((resolve) => window.setTimeout(resolve, 300));
+    if (pendingCartChoice === "add-all") {
+      addActiveDishToOrder(false);
+      orderItems = [];
+      clearCart();
+      renderOrder();
+    }
+    openWhatsAppLink(order.url, cartChoiceFallback, cartChoiceFallbackLink);
+    finishCartChoice({ choice: pendingCartChoice, details, sent: true });
+  } catch (error) {
+    cartChoiceValidation.textContent = "Unable to prepare this order. Please try again.";
+    cartChoiceValidation.hidden = false;
+    console.error("Unable to build the WhatsApp order link.", error);
+  }
+});
+
+document.querySelector("#cart-choice-geolocation").addEventListener("click", () => {
+  const hint = document.querySelector("#cart-choice-location-hint");
+  if (!navigator.geolocation) {
+    hint.textContent = "Location is unavailable in this browser. You can enter it manually.";
+    return;
+  }
+  hint.textContent = "Finding your location…";
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => {
+      cartChoiceLocation.value = `https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
+      cartChoiceLocation.dispatchEvent(new Event("input", { bubbles: true }));
+      hint.textContent = "Location added. You can still edit it before sending.";
+    },
+    () => {
+      hint.textContent = "We couldn't access your location. Please enter it manually.";
+    },
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+  );
+});
+
+cartChoiceFallbackLink.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (cartChoiceFallbackLink.href) {
+    openWhatsAppLink(cartChoiceFallbackLink.href, cartChoiceFallback, cartChoiceFallbackLink);
+  }
+});
+
+cartChoiceCopy.addEventListener("click", () => {
+  if (activeWhatsAppMessage) {
+    copyWhatsAppMessage(activeWhatsAppMessage, cartChoiceCopied);
   }
 });
 
