@@ -132,18 +132,16 @@ function buildOrderMessage(items, details = {}) {
     throw new Error("Cannot build an order message without any items.");
   }
 
-  const lines = [
-    "*TAWALA CAFÉ ORDER* 🍽️",
-    `Order No: TC-${String(Date.now()).slice(-4).padStart(4, "0")}`,
-    ""
-  ];
   const orderType = String(details.orderType ?? "").trim();
   const tableNumber = String(details.tableNumber ?? "").trim();
-  const name = String(details.name ?? "").trim();
   const location = String(details.location ?? "").trim();
+  const pickupTime = String(details.pickupTime ?? "").trim();
+  const name = String(details.name ?? "").trim();
   const instructions = String(details.specialInstructions ?? "").trim();
+  const lines = [];
   let total = 0;
 
+  const orderedItems = [];
   items.forEach((item) => {
     const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
     const price = Number(item.price);
@@ -156,33 +154,33 @@ function buildOrderMessage(items, details = {}) {
       throw new Error("An order item is missing its name.");
     }
 
-    const displayName = option ? `${itemName}, ${option}` : itemName;
-    total += price * quantity;
-    lines.push(`• ${displayName} (${quantity}) — ${formatMenuPrice(price * quantity)}`);
-
-    const itemNote = String(item.note ?? item.specialInstructions ?? "").trim();
-    if (itemNote) {
-      lines.push(`   Note: ${itemNote}`);
-    }
+    const lineTotal = price * quantity;
+    total += lineTotal;
+    const displayName = option ? `${itemName} (${option})` : itemName;
+    orderedItems.push(quantity > 1 ? `${displayName} (${quantity})` : displayName);
   });
 
-  if (instructions) {
-    lines.push(`   Note: ${instructions}`);
-  }
+  lines.push(`Hi Tawala Café, I wish to order ${orderedItems.join(", ")}.`);
+  lines.push(`Total: ${formatMenuPrice(total)}`);
 
-  lines.push("", `💰 *Total: ${formatMenuPrice(total)}*`);
   if (orderType) {
     const normalizedType = orderType.toLowerCase();
-    const typeLabel = normalizedType === "dine in" && tableNumber
-      ? `Dine in (Table ${tableNumber})`
-      : orderType;
-    lines.push("", `📍 ${typeLabel}`);
-    if (name) {
-      lines.push(`👤 ${name}`);
-    }
+    lines.push(`Order type: ${orderType}`);
     if (normalizedType === "delivery" && location) {
-      lines.push(`📌 ${location}`);
+      lines.push(`Delivery location: ${location}`);
     }
+    if (normalizedType === "pickup" && pickupTime) {
+      lines.push(`Pickup time: ${pickupTime}`);
+    }
+    if (normalizedType === "dine in" && tableNumber) {
+      lines.push(`Table: ${tableNumber}`);
+    }
+  }
+  if (name) {
+    lines.push(`Name: ${name}`);
+  }
+  if (instructions) {
+    lines.push(`Notes: ${instructions}`);
   }
 
   const payment = !orderType
@@ -190,7 +188,7 @@ function buildOrderMessage(items, details = {}) {
     : orderType.toLowerCase() === "delivery"
       ? "on delivery"
       : "at the counter";
-  lines.push(`💳 ${payment}`);
+  lines.push(`Payment: ${payment}`);
   return lines.join("\n");
 }
 
