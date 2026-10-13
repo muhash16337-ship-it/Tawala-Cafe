@@ -455,6 +455,12 @@ function createMenuItem(item) {
   const optionPrice = document.createElement("p");
   optionPrice.className = "menu__item-price";
   optionPrice.textContent = `KSh ${new Intl.NumberFormat("en-KE").format(item.price)}`;
+  const pricePill = document.createElement("span");
+  pricePill.className = "menu__item-price-pill";
+  pricePill.append(optionPrice);
+  const accent = document.createElement("span");
+  accent.className = "menu__item-accent";
+  accent.setAttribute("aria-hidden", "true");
 
   if (item.options?.length) {
     const options = document.createElement("div");
@@ -482,7 +488,13 @@ function createMenuItem(item) {
 
   const priceRow = document.createElement("div");
   priceRow.className = "menu__item-price-row";
-  priceRow.append(optionPrice);
+  const orderHint = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  orderHint.classList.add("menu__item-order-hint");
+  orderHint.setAttribute("viewBox", "0 0 24 24");
+  orderHint.setAttribute("aria-hidden", "true");
+  orderHint.innerHTML = '<path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
+  listItem.append(accent);
+  priceRow.append(pricePill, orderHint);
   listItem.append(details, priceRow);
   return listItem;
 }
