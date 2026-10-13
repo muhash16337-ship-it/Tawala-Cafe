@@ -853,6 +853,7 @@ function askCartChoice({ dishName, dishPrice, cartCount, cartTotal }) {
   cartChoiceValidation.hidden = true;
   cartChoiceLocation.classList.remove("is-invalid");
   cartChoiceSend.classList.remove("is-sending", "is-sent");
+  cartChoiceBack.hidden = false;
   cartChoiceDialog.querySelectorAll("[data-cart-choice]").forEach((button) => {
     button.classList.remove("is-selected");
     button.setAttribute("aria-pressed", "false");
@@ -880,6 +881,45 @@ function askCartChoice({ dishName, dishPrice, cartCount, cartTotal }) {
     cartChoiceDialog.showModal();
     syncModalBodyLock();
     cartChoiceDialog.querySelector('[data-cart-choice="add-all"]').focus();
+  });
+}
+
+function askSingleDishDetails(orderLines) {
+  cartChoiceStepOne.classList.add("is-active");
+  cartChoiceStepTwo.classList.remove("is-active");
+  cartChoiceStepOne.removeAttribute("inert");
+  cartChoiceStepOne.setAttribute("aria-hidden", "false");
+  cartChoiceStepTwo.setAttribute("inert", "");
+  cartChoiceStepTwo.setAttribute("aria-hidden", "true");
+  cartChoiceSteps.classList.remove("cart-choice-dialog__steps--details");
+  cartChoiceFallback.hidden = true;
+  cartChoiceValidation.hidden = true;
+  cartChoiceLocation.classList.remove("is-invalid");
+  cartChoiceSend.classList.remove("is-sending", "is-sent");
+  cartChoiceBack.hidden = true;
+  cartChoiceDialog.querySelectorAll("[data-cart-choice]").forEach((button) => {
+    button.classList.remove("is-selected");
+    button.setAttribute("aria-pressed", "false");
+  });
+
+  return new Promise((resolve) => {
+    resolveCartChoice = resolve;
+    pendingCartChoice = null;
+    cartChoiceOrderLines = orderLines;
+    const rememberedType = sessionStorage.getItem("tawala-order-type") || "Delivery";
+    const rememberedName = sessionStorage.getItem("tawala-order-name") || orderCustomerName.value || "";
+    cartChoiceDishOpener = document.activeElement;
+    cartChoiceDialog.setAttribute("aria-labelledby", "cart-details-title");
+    cartChoiceDialog.removeAttribute("aria-describedby");
+    cartChoiceName.value = rememberedName;
+    cartChoiceLocation.value = orderLocation.value;
+    cartChoiceNotes.value = orderInstructions.value;
+    cartChoicePickupTime.value = "";
+    cartChoiceTable.value = orderTableNumber.value;
+    updateCartChoiceMethod(rememberedType);
+    showCartChoiceDetails(null, orderLines);
+    cartChoiceDialog.showModal();
+    syncModalBodyLock();
   });
 }
 
@@ -1168,7 +1208,7 @@ dishDialogOrder.addEventListener("click", async () => {
     return;
   }
 
-  let lines = [{
+  const lines = [{
     id: activeDish.id,
     option: activeDishOption?.label ?? "",
     quantity: activeDishQuantity
@@ -1187,16 +1227,8 @@ dishDialogOrder.addEventListener("click", async () => {
     return;
   }
 
-  try {
-    const order = getWhatsAppOrder(lines);
-    activeWhatsAppMessage = order.message;
-    dishDialogOrderEmpty.hidden = true;
-    openWhatsAppLink(order.url, dishDialogFallback, dishDialogFallbackLink);
-  } catch (error) {
-    dishDialogOrderEmpty.textContent = "Unable to prepare this order. Please try again.";
-    dishDialogOrderEmpty.hidden = false;
-    console.error("Unable to build the WhatsApp order link.", error);
-  }
+  dishDialogOrderEmpty.hidden = true;
+  await askSingleDishDetails(lines);
 });
 
 document.querySelector("#cart-choice-close").addEventListener("click", () => {
@@ -1265,6 +1297,10 @@ cartChoiceDialog.addEventListener("keydown", (event) => {
 });
 
 cartChoiceBack.addEventListener("click", () => {
+  if (pendingCartChoice === null) {
+    finishCartChoice({ choice: "cancel" });
+    return;
+  }
   cartChoiceSteps.classList.remove("cart-choice-dialog__steps--details");
   cartChoiceStepTwo.classList.remove("is-active");
   cartChoiceStepOne.classList.add("is-active");
@@ -1275,6 +1311,7 @@ cartChoiceBack.addEventListener("click", () => {
   cartChoiceDialog.setAttribute("aria-labelledby", "cart-choice-title");
   cartChoiceDialog.setAttribute("aria-describedby", "cart-choice-subtitle");
   cartChoiceDialog.querySelector(`[data-cart-choice="${pendingCartChoice}"]`)?.focus();
+  cartChoiceBack.hidden = false;
 });
 
 cartChoiceTypeOptions.forEach((button) => {
