@@ -162,6 +162,138 @@
                 </div>
             </article>
         </dialog>
+        <dialog class="dish-dialog cart-choice-dialog" id="cart-choice-dialog" aria-labelledby="cart-choice-title" aria-describedby="cart-choice-subtitle">
+            <div class="dish-dialog__backdrop"></div>
+            <article class="cart-choice-dialog__panel" role="document">
+                <button class="dish-dialog__close" id="cart-choice-close" type="button" aria-label="Cancel and close">×</button>
+                <div class="cart-choice-dialog__steps" id="cart-choice-steps">
+                    <section class="cart-choice-dialog__step is-active" id="cart-choice-step-one" aria-labelledby="cart-choice-title">
+                        <div class="cart-choice-dialog__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 8.5h14l1.2 11H3.8L5 8.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                                <path d="M8.5 9V6.5a3.5 3.5 0 0 1 7 0V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <p class="cart-choice-dialog__progress"><span class="cart-choice-dialog__dot is-active"></span><span class="cart-choice-dialog__dot"></span> Step 1 of 2</p>
+                        <p class="dish-dialog__eyebrow">A quick order choice</p>
+                        <h2 class="cart-choice-dialog__title" id="cart-choice-title">You already have items in your order</h2>
+                        <p class="cart-choice-dialog__subtitle" id="cart-choice-subtitle">How would you like to send this dish?</p>
+
+                        <div class="cart-choice-dialog__summary" aria-live="polite">
+                            <p>Current order <strong id="cart-choice-cart-summary"></strong></p>
+                            <p>This dish <strong id="cart-choice-dish-summary"></strong></p>
+                            <p class="cart-choice-dialog__combined">Combined total <strong id="cart-choice-combined-total"></strong></p>
+                        </div>
+
+                        <div class="cart-choice-dialog__options">
+                            <button class="cart-choice-dialog__option cart-choice-dialog__option--primary" type="button" data-cart-choice="add-all" aria-pressed="false">
+                                <strong>Add to my order &amp; send all</strong>
+                                <span>Include this dish and send everything together.</span>
+                            </button>
+                            <button class="cart-choice-dialog__option" type="button" data-cart-choice="only-this" aria-pressed="false">
+                                <strong>Send this dish only</strong>
+                                <span>Keep your current order unchanged.</span>
+                            </button>
+                        </div>
+                        <button class="cart-choice-dialog__cancel" type="button" data-cart-choice="cancel">Cancel</button>
+                    </section>
+
+                    <section class="cart-choice-dialog__step cart-choice-dialog__step--details" id="cart-choice-step-two" aria-labelledby="cart-details-title" aria-hidden="true" inert>
+                        <header class="cart-choice-dialog__step-header">
+                            <button class="cart-choice-dialog__back" id="cart-choice-back" type="button" aria-label="Back to order choice">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <span>Back</span>
+                            </button>
+                            <p class="cart-choice-dialog__progress"><span class="cart-choice-dialog__dot is-active"></span><span class="cart-choice-dialog__dot is-active"></span> Step 2 of 2</p>
+                        </header>
+                        <div class="cart-choice-dialog__details-scroll">
+                            <div class="cart-choice-dialog__compact-summary">
+                                <strong id="cart-choice-items-count"></strong>
+                                <span id="cart-choice-order-total"></span>
+                                <span class="cart-choice-dialog__summary-type" id="cart-choice-order-type-summary"></span>
+                            </div>
+                            <h2 class="cart-choice-dialog__title" id="cart-details-title">How would you like your order?</h2>
+
+                            <fieldset class="cart-choice-dialog__type-fieldset">
+                                <legend class="sr-only">Choose how to receive your order</legend>
+                                <div class="cart-choice-dialog__type-options" role="radiogroup" aria-label="Order type">
+                                    <button class="cart-choice-dialog__type-option" type="button" role="radio" aria-checked="true" data-order-method="Delivery">
+                                        <span class="cart-choice-dialog__type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6h11v11H3zM14 10h4l3 3v4h-7zM7 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM18 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span>
+                                        <span class="cart-choice-dialog__type-name">Delivery</span>
+                                        <span class="cart-choice-dialog__type-description">We bring it to you</span>
+                                        <span class="cart-choice-dialog__type-check" aria-hidden="true">✓</span>
+                                    </button>
+                                    <button class="cart-choice-dialog__type-option" type="button" role="radio" aria-checked="false" data-order-method="Pickup">
+                                        <span class="cart-choice-dialog__type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10h16l-1-6H5l-1 6ZM5 10v10h14V10M9 20v-6h6v6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 10a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
+                                        <span class="cart-choice-dialog__type-name">Pickup</span>
+                                        <span class="cart-choice-dialog__type-description">Collect at the café</span>
+                                        <span class="cart-choice-dialog__type-check" aria-hidden="true">✓</span>
+                                    </button>
+                                    <button class="cart-choice-dialog__type-option" type="button" role="radio" aria-checked="false" data-order-method="Dine in">
+                                        <span class="cart-choice-dialog__type-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3v7M8 3v7M11 3v7M8 10v11M18 3v18M18 3c-2.5 2-3 5-3 8h3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                                        <span class="cart-choice-dialog__type-name">Dine in</span>
+                                        <span class="cart-choice-dialog__type-description">Eat at the café</span>
+                                        <span class="cart-choice-dialog__type-check" aria-hidden="true">✓</span>
+                                    </button>
+                                </div>
+                            </fieldset>
+
+                            <label class="cart-choice-dialog__field">
+                                <span>Name (optional)</span>
+                                <input id="cart-choice-name" type="text" autocomplete="name" placeholder="Your name">
+                            </label>
+
+                            <div class="cart-choice-dialog__method-panel is-active" data-method-panel="Delivery">
+                                <label class="cart-choice-dialog__field">
+                                    <span>Delivery location <strong aria-hidden="true">*</strong></span>
+                                    <input id="cart-choice-location" type="text" autocomplete="street-address" placeholder="e.g. Utawala, Astrol, house or landmark">
+                                </label>
+                                <button class="cart-choice-dialog__geolocation" id="cart-choice-geolocation" type="button">Use my current location</button>
+                                <p class="cart-choice-dialog__hint" id="cart-choice-location-hint" aria-live="polite">Enter your location, or use your current location.</p>
+                                <label class="cart-choice-dialog__field">
+                                    <span>Special instructions (optional)</span>
+                                    <textarea id="cart-choice-notes" rows="2" placeholder="Anything we should know?"></textarea>
+                                </label>
+                            </div>
+
+                            <div class="cart-choice-dialog__method-panel" data-method-panel="Pickup" hidden>
+                                <label class="cart-choice-dialog__field">
+                                    <span>Pickup time (optional)</span>
+                                    <select id="cart-choice-pickup-time">
+                                        <option value="">Choose a pickup time</option>
+                                        <option>As soon as possible</option>
+                                        <option>In 15 minutes</option>
+                                        <option>In 30 minutes</option>
+                                        <option>In 1 hour</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div class="cart-choice-dialog__method-panel" data-method-panel="Dine in" hidden>
+                                <label class="cart-choice-dialog__field">
+                                    <span>Table number (optional)</span>
+                                    <input id="cart-choice-table" type="text" inputmode="numeric" placeholder="Your table number">
+                                </label>
+                            </div>
+                            <p class="cart-choice-dialog__validation" id="cart-choice-validation" role="status" aria-live="polite" hidden>Enter your delivery location to continue</p>
+                        </div>
+                        <footer class="cart-choice-dialog__step-footer">
+                            <button class="cart-choice-dialog__send" id="cart-choice-send" type="button" aria-disabled="true">
+                                <svg class="cart-choice-dialog__send-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.7a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.4-4.9a8.4 8.4 0 1 1 16.1-3.9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.8 1.8c.1.2.1.4 0 .6l-.6.7c-.2.2-.2.4 0 .6.4.7 1.1 1.4 1.8 1.8.2.1.4.1.6 0l.8-.9c.2-.2.4-.2.6-.1l1.7.8c.3.1.4.3.4.5 0 .3-.2 1-.6 1.3-.4.4-1 .6-1.6.5-1-.1-2.4-.7-3.8-1.9-1.2-1-2-2.3-2.2-3.2-.3-.9-.1-1.8.4-2.4Z" fill="currentColor"/></svg>
+                                <span>Send order on WhatsApp</span>
+                                <span class="cart-choice-dialog__send-spinner" aria-hidden="true"></span>
+                                <span class="cart-choice-dialog__send-check" aria-hidden="true">✓</span>
+                            </button>
+                            <div class="dish-dialog__whatsapp-fallback" id="cart-choice-whatsapp-fallback" hidden>
+                                <a class="dish-dialog__fallback-link" id="cart-choice-fallback-link" href="#" target="_blank" rel="noopener">WhatsApp did not open? Tap here</a>
+                                <button class="dish-dialog__copy" id="cart-choice-copy" type="button">Copy order text</button>
+                                <span class="dish-dialog__copied" id="cart-choice-copied" role="status" hidden>Copied</span>
+                            </div>
+                        </footer>
+                    </section>
+                </div>
+            </article>
+        </dialog>
         <aside class="order-bar" id="order-bar" aria-label="Current order" hidden>
             <p class="order-bar__summary"><strong id="order-bar-count">0 dishes</strong><span id="order-bar-total">KSh 0</span></p>
             <button class="btn order-bar__review" id="order-review-open" type="button">Review order</button>
@@ -170,23 +302,51 @@
             <div class="dish-dialog__backdrop"></div>
             <article class="dish-dialog__panel order-dialog__panel">
                 <button class="dish-dialog__close" id="order-dialog-close" type="button" aria-label="Close order review">×</button>
-                <div class="order-dialog__content">
+                <header class="order-dialog__header">
                     <p class="dish-dialog__eyebrow">Your selections</p>
                     <h2 class="dish-dialog__title" id="order-dialog-title">Review your order</h2>
+                </header>
+                <div class="order-dialog__content">
                     <ul class="order-dialog__items" id="order-dialog-items"></ul>
                     <p class="order-dialog__empty" id="order-dialog-empty" role="status" hidden>Your order is empty. Pick a dish first.</p>
                     <p class="dish-dialog__total order-dialog__total">Total <strong id="order-dialog-total">KSh 0</strong></p>
-                    <label class="order-dialog__field">Name (optional)<input id="order-customer-name" type="text" autocomplete="name"></label>
-                    <label class="order-dialog__field">Order type
-                        <select id="order-type">
+
+                    <label class="order-dialog__field">
+                        <span class="order-dialog__label">Name (optional)</span>
+                        <input id="order-customer-name" type="text" autocomplete="name">
+                    </label>
+
+                    <div class="order-dialog__field order-dialog__field--type">
+                        <span class="order-dialog__label">Order type</span>
+                        <div class="order-dialog__type-toggle" id="order-type-toggle" aria-label="Choose order type">
+                            <button class="order-dialog__type-option is-active" type="button" data-order-type-option="Dine in" aria-pressed="true">Dine in</button>
+                            <button class="order-dialog__type-option" type="button" data-order-type-option="Pickup" aria-pressed="false">Pickup</button>
+                            <button class="order-dialog__type-option" type="button" data-order-type-option="Delivery" aria-pressed="false">Delivery</button>
+                        </div>
+                        <select id="order-type" aria-label="Choose order type" hidden>
                             <option value="Dine in">Dine in</option>
                             <option value="Pickup">Pickup</option>
                             <option value="Delivery">Delivery</option>
                         </select>
+                    </div>
+
+                    <label class="order-dialog__field" id="order-table-field">
+                        <span class="order-dialog__label">Table number</span>
+                        <input id="order-table-number" type="text" inputmode="numeric">
                     </label>
-                    <label class="order-dialog__field" id="order-table-field">Table number<input id="order-table-number" type="text" inputmode="numeric"></label>
-                    <label class="order-dialog__field" id="order-location-field" hidden>Delivery location<input id="order-location" type="text" autocomplete="street-address"></label>
-                    <label class="order-dialog__field">Special instructions (optional)<textarea id="order-instructions" rows="2"></textarea></label>
+
+                    <label class="order-dialog__field" id="order-location-field">
+                        <span class="order-dialog__label">Delivery location</span>
+                        <input id="order-location" type="text" autocomplete="street-address">
+                    </label>
+
+                    <label class="order-dialog__field">
+                        <span class="order-dialog__label">Special instructions (optional)</span>
+                        <textarea id="order-instructions" rows="2"></textarea>
+                    </label>
+                </div>
+
+                <footer class="order-dialog__footer">
                     <button class="btn order-dialog__send" id="order-send-whatsapp" type="button">Send order on WhatsApp</button>
                     <p class="dish-dialog__order-empty" id="order-empty-message" role="status" hidden>Your order is empty. Pick a dish first.</p>
                     <div class="dish-dialog__whatsapp-fallback" id="order-whatsapp-fallback" hidden>
@@ -198,7 +358,7 @@
                         <button class="order-dialog__clear" id="order-clear" type="button">Clear order</button>
                         <button class="order-dialog__new" id="order-new" type="button" hidden>Start a new order</button>
                     </div>
-                </div>
+                </footer>
             </article>
         </dialog>
         <section id="about" class="about section section--dark" aria-labelledby="about-heading">
