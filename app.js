@@ -894,6 +894,7 @@ function openDishDialog(item, opener) {
 
   updateDishDialogPrice();
   dishDialog.showModal();
+  syncModalBodyLock();
   dishDialog.querySelector(".dish-dialog__close").focus();
 }
 
@@ -938,6 +939,7 @@ dishDialog.addEventListener("keydown", (event) => {
 });
 
 dishDialog.addEventListener("close", () => {
+  syncModalBodyLock();
   dishDialogOpener?.focus();
   dishDialogOpener = null;
 });
@@ -1004,6 +1006,7 @@ document.querySelector("#order-review-open").addEventListener("click", () => {
   orderEmptyMessage.hidden = true;
   orderNew.hidden = true;
   orderDialog.showModal();
+  syncModalBodyLock();
   document.querySelector("#order-dialog-close").focus();
 });
 
@@ -1020,6 +1023,7 @@ orderDialog.addEventListener("keydown", (event) => {
   }
 });
 orderDialog.addEventListener("close", () => {
+  syncModalBodyLock();
   if (!orderBar.hidden) {
     document.querySelector("#order-review-open").focus();
   } else {
