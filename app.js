@@ -3,7 +3,7 @@ const CONFIG = Object.freeze({
   address: "[ADDRESS]",
   mapEmbedUrl: "[MAP EMBED URL]",
   instagram: "[HANDLE]",
-  tiktok: "[HANDLE]",
+  tiktok: "tawala.caffe",
   services: ["Dine in", "Pickup", "Delivery"],
   payment: "At the counter or on delivery only",
   timeZone: "Africa/Nairobi",
@@ -239,6 +239,34 @@ document.querySelectorAll("[data-social-link]").forEach((link) => {
   link.href = `${baseUrl}${encodeURIComponent(username)}`;
   link.hidden = false;
 });
+
+const footerSocialLinks = document.querySelector(".footer__social-links");
+if (footerSocialLinks && "IntersectionObserver" in window && !reduceMotionQuery.matches) {
+  const footerSocialItems = [...footerSocialLinks.querySelectorAll("a:not([hidden])")];
+  footerSocialItems.forEach((link, index) => {
+    link.style.setProperty("--social-index", String(index));
+  });
+  footerSocialLinks.classList.add("footer__social-links--entrance");
+  let footerSocialObserver;
+  const revealFooterSocialLinks = () => {
+    const bounds = footerSocialLinks.getBoundingClientRect();
+    if (bounds.top < window.innerHeight && bounds.bottom > 0) {
+      footerSocialLinks.classList.add("is-visible");
+      footerSocialObserver.disconnect();
+      window.removeEventListener("scroll", revealFooterSocialLinks);
+      window.removeEventListener("pageshow", revealFooterSocialLinks);
+    }
+  };
+  footerSocialObserver = new IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      revealFooterSocialLinks();
+    }
+  }, { threshold: 0.25 });
+  footerSocialObserver.observe(footerSocialLinks);
+  window.addEventListener("scroll", revealFooterSocialLinks, { passive: true });
+  window.addEventListener("pageshow", revealFooterSocialLinks);
+  revealFooterSocialLinks();
+}
 
 function setMenuOpen(isOpen, returnFocus = false) {
   navToggle.setAttribute("aria-expanded", String(isOpen));

@@ -759,14 +759,21 @@ button:focus-visible {
 }
 
 .footer__social-links a {
+  position: relative;
   display: grid;
   width: 2.75rem;
   height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
   place-items: center;
   border: 1px solid rgb(201 162 74 / 55%);
   border-radius: 50%;
   color: var(--color-gold);
-  transition: color 180ms ease, background-color 180ms ease;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 240ms ease;
 }
 
 .footer__social-links a[hidden] {
@@ -776,6 +783,48 @@ button:focus-visible {
 .footer__social-links a:hover {
   background: var(--color-gold);
   color: var(--color-black);
+}
+
+.footer__social-links a:focus-visible {
+  outline: 2px solid var(--color-gold-light);
+  outline-offset: 4px;
+}
+
+.footer__social-links a[data-social-link="tiktok"]:hover,
+.footer__social-links a[data-social-link="tiktok"]:focus-visible {
+  box-shadow: 0 0 0.6rem rgb(201 162 74 / 42%);
+  animation: footer-tiktok-glow 1.6s ease-in-out infinite;
+  transform: translateY(-4px);
+}
+
+.footer__social-links a[data-social-link="tiktok"]:active {
+  transform: translateY(-2px) scale(0.95);
+}
+
+.footer__social-links a[data-social-link="tiktok"]::after {
+  position: absolute;
+  bottom: calc(100% + 0.55rem);
+  left: 50%;
+  width: max-content;
+  border: 1px solid rgb(201 162 74 / 42%);
+  border-radius: 0.45rem;
+  padding: 0.3rem 0.5rem;
+  background: #14110b;
+  color: var(--color-ivory);
+  content: attr(data-tooltip);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 0.25rem);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.footer__social-links a[data-social-link="tiktok"]:hover::after,
+.footer__social-links a[data-social-link="tiktok"]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .footer__social-links svg {
@@ -791,6 +840,131 @@ button:focus-visible {
 .footer__social-links .footer__social-dot {
   fill: currentColor;
   stroke: none;
+}
+
+.footer__location {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.footer__address {
+  position: relative;
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-ivory);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.footer__address::after {
+  position: absolute;
+  right: 0;
+  bottom: 0.25rem;
+  left: 1.55rem;
+  height: 1px;
+  background: var(--color-gold);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 220ms ease;
+}
+
+.footer__address:hover,
+.footer__address:focus-visible {
+  color: var(--color-gold-light);
+}
+
+.footer__address:hover::after,
+.footer__address:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.footer__address svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+  color: var(--color-gold);
+  transition: transform 220ms ease;
+}
+
+.footer__address:hover svg,
+.footer__address:focus-visible svg {
+  transform: translateY(-3px);
+}
+
+.footer__directions {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(201 162 74 / 62%);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 0.85rem;
+  color: var(--color-gold-light);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.footer__directions:hover,
+.footer__directions:focus-visible {
+  border-color: var(--color-gold-light);
+  background: rgb(201 162 74 / 12%);
+  color: var(--color-ivory);
+}
+
+.footer__social-links a[data-social-link="tiktok"] .footer__tiktok-icon {
+  position: relative;
+  z-index: 1;
+  fill: currentColor;
+  stroke: none;
+  transform: translate(0);
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.footer__social-links a[data-social-link="tiktok"] .footer__tiktok-glitch {
+  position: absolute;
+  fill: #6fe7f2;
+  stroke: none;
+  opacity: 0;
+  transform: translate(-2px, 2px);
+  pointer-events: none;
+}
+
+.footer__social-links a[data-social-link="tiktok"]:hover .footer__tiktok-icon,
+.footer__social-links a[data-social-link="tiktok"]:focus-visible .footer__tiktok-icon {
+  transform: translate(0);
+  animation: footer-tiktok-slide-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.footer__social-links a[data-social-link="tiktok"]:hover .footer__tiktok-glitch,
+.footer__social-links a[data-social-link="tiktok"]:focus-visible .footer__tiktok-glitch {
+  animation: footer-tiktok-glitch 300ms ease-out both;
+}
+
+.footer__social-links--entrance a:not([hidden]) {
+  opacity: 0;
+  transform: translateY(0.8rem);
+  transition:
+    opacity 420ms ease,
+    transform 520ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(var(--social-index, 0) * 80ms);
+}
+
+.footer__social-links--entrance.is-visible a:not([hidden]) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.footer__social-links--entrance.is-visible a[data-social-link="tiktok"]:hover,
+.footer__social-links--entrance.is-visible a[data-social-link="tiktok"]:focus-visible {
+  transform: translateY(-4px);
 }
 
 .footer__bottom {
@@ -1056,6 +1230,23 @@ button:focus-visible {
 
   .footer__brand {
     grid-column: auto;
+  }
+
+  .footer__social {
+    text-align: center;
+  }
+
+  .footer__social-links {
+    justify-content: center;
+  }
+
+  .footer__location {
+    justify-content: center;
+  }
+
+  .footer__address {
+    justify-content: center;
+    text-align: center;
   }
 }
 
