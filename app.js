@@ -1094,6 +1094,30 @@ menuResults.addEventListener("click", (event) => {
   }
 });
 
+menuResults.addEventListener("click", (event) => {
+  if (
+    reduceMotionQuery.matches ||
+    !window.matchMedia("(hover: none), (pointer: coarse)").matches ||
+    event.detail === 0 ||
+    event.target.closest("button, a, input, select")
+  ) {
+    return;
+  }
+  const itemElement = event.target.closest(".menu__item");
+  if (!itemElement) {
+    return;
+  }
+
+  const bounds = itemElement.getBoundingClientRect();
+  const ripple = document.createElement("span");
+  ripple.className = "menu__item-ripple";
+  ripple.setAttribute("aria-hidden", "true");
+  ripple.style.left = `${event.clientX - bounds.left}px`;
+  ripple.style.top = `${event.clientY - bounds.top}px`;
+  itemElement.append(ripple);
+  window.setTimeout(() => ripple.remove(), 600);
+});
+
 menuResults.addEventListener("keydown", (event) => {
   if (!["Enter", " "].includes(event.key) || event.target !== event.target.closest("[data-order-item]")) {
     return;
@@ -1564,4 +1588,18 @@ menuSearchClear.addEventListener("click", () => {
   menuSearch.focus();
 });
 updateMenuResultCount();
+if ("IntersectionObserver" in window && !reduceMotionQuery.matches) {
+  const menuSection = document.querySelector("#menu");
+  const menuEntranceObserver = new IntersectionObserver((entries, observer) => {
+    if (!entries.some((entry) => entry.isIntersecting)) {
+      return;
+    }
+    menuResults.querySelectorAll(".menu__item").forEach((item, index) => {
+      item.style.setProperty("--menu-entry-delay", `${Math.min(index * 40, 400)}ms`);
+      item.classList.add("menu__item--entered");
+    });
+    observer.disconnect();
+  }, { threshold: 0 });
+  menuEntranceObserver.observe(menuSection);
+}
 renderOrder();

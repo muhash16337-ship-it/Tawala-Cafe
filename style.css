@@ -1912,6 +1912,116 @@ button:focus-visible {
   text-align: center;
 }
 
+@keyframes menu-row-border-sweep {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: -100% 50%;
+  }
+}
+
+@keyframes menu-row-light-sweep {
+  from {
+    left: -75%;
+  }
+  to {
+    left: 130%;
+  }
+}
+
+@keyframes menu-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes menu-row-ripple {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(18);
+  }
+}
+
+@keyframes menu-row-tap-flash {
+  0%,
+  100% {
+    border-color: #d4af37;
+    background-color: #1c170c;
+  }
+  50% {
+    border-color: #f0d98a;
+    background-color: #2a2110;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu__item,
+  .menu__item::before,
+  .menu__item::after,
+  .menu__item-accent,
+  .menu__item-name,
+  .menu__item-name::after,
+  .menu__item-price-pill,
+  .menu__item-price,
+  .menu__item-order-hint {
+    animation: none !important;
+    transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease !important;
+  }
+
+  .menu__item--entered {
+    opacity: 1;
+    transform: none;
+  }
+
+  .menu__item::before,
+  .menu__item::after,
+  .menu__item-ripple,
+  .menu__item-order-hint {
+    display: none;
+  }
+
+  .menu__item:hover,
+  .menu__item:focus-visible {
+    border-color: #d4af37;
+    background-color: #14110b;
+    box-shadow: none;
+    transform: none;
+    will-change: auto;
+  }
+
+  .menu__item:hover .menu__item-name,
+  .menu__item:focus-visible .menu__item-name {
+    color: #d4af37;
+    transform: none;
+  }
+
+  .menu__item:hover .menu__item-name::after,
+  .menu__item:focus-visible .menu__item-name::after,
+  .menu__item:hover .menu__item-accent,
+  .menu__item:focus-visible .menu__item-accent {
+    transform: none;
+  }
+
+  .menu__item:hover .menu__item-price,
+  .menu__item:focus-visible .menu__item-price {
+    color: #d4af37;
+    text-shadow: none;
+    transform: none;
+  }
+
+  .menu__item:hover .menu__item-price-pill,
+  .menu__item:focus-visible .menu__item-price-pill {
+    border-color: transparent;
+    background: none;
+  }
+}
+
 .menu__item--unavailable {
   opacity: 0.52;
 }
@@ -1928,7 +2038,7 @@ button:focus-visible {
   justify-content: center;
   border: 0;
   padding: 1.25rem;
-  overflow: auto;
+  overflow: hidden;
   background: transparent;
   color: var(--color-text-on-dark);
 }
