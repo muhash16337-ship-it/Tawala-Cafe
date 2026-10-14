@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tawalacafe.co.ke/sitemap.xml
