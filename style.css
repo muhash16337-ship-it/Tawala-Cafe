@@ -52,13 +52,40 @@ html {
 }
 
 body {
+  isolation: isolate;
   margin: 0;
   min-width: 320px;
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.6;
   color: var(--color-text);
-  background: var(--color-ivory);
+  background-color: #0a0a0a;
+}
+
+body::before,
+body::after {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+body::before {
+  background: url("images/caffe.jpeg") center / cover no-repeat;
+  filter: blur(3px) saturate(0.85) brightness(0.8);
+  transform: scale(1.05);
+}
+
+body::after {
+  background:
+    linear-gradient(rgb(143 107 36 / 8%), rgb(143 107 36 / 8%)),
+    linear-gradient(
+      to bottom,
+      rgb(10 10 10 / 88%) 0%,
+      rgb(10 10 10 / 78%) 50%,
+      rgb(10 10 10 / 92%) 100%
+    );
 }
 
 body.modal-open {
@@ -219,13 +246,12 @@ button:focus-visible {
   z-index: -3;
   inset: -2%;
   background-image:
-    linear-gradient(90deg, rgb(0 0 0 / 82%) 0%, rgb(0 0 0 / 49%) 48%, rgb(0 0 0 / 75%) 100%),
-    linear-gradient(0deg, #000 0%, transparent 34%, rgb(0 0 0 / 30%) 100%),
-    url("images/cafe-interior.jpg");
+    linear-gradient(0deg, rgb(10 10 10 / 95%) 0%, rgb(10 10 10 / 68%) 48%, rgb(10 10 10 / 45%) 100%),
+    url("images/caffe.jpeg");
   background-position: center;
   background-size: cover;
   content: "";
-  animation: hero-ken-burns 24s ease-in-out infinite alternate;
+  animation: hero-ken-burns 30s ease-in-out infinite alternate;
 }
 
 .hero::after {
@@ -1003,10 +1029,10 @@ button:focus-visible {
 
 @keyframes hero-ken-burns {
   from {
-    transform: scale(1);
+    transform: scale(1.05);
   }
   to {
-    transform: scale(1.075);
+    transform: scale(1.12);
   }
 }
 
