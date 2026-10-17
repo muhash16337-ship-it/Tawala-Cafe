@@ -1,5 +1,8 @@
 const CONFIG = Object.freeze({
   whatsappNumber: "254703789777",
+  tillNumber: "4366121",
+  paymentMethod: "M-Pesa Buy Goods and Services (Lipa na M-Pesa)",
+  tillName: "",
   address: "[ADDRESS]",
   mapEmbedUrl: "[MAP EMBED URL]",
   instagram: "[HANDLE]",
@@ -19,6 +22,8 @@ const CONFIG = Object.freeze({
     Sunday: "[HOURS]"
   }
 });
+
+const SHOW_DISH_PHOTOS = true;
 
 const menuItems = [
   { id: "mandazi", name: "Mandazi", description: "", category: "Breakfast & Pastry", price: 25, options: null, image: null, popular: false, available: true },
@@ -97,6 +102,103 @@ const menuItems = [
   { id: "water", name: "Water", description: "", category: "Soda & Water", price: 70, options: [{ label: "500ml", price: 70 }, { label: "1L", price: 120 }], image: null, popular: false, available: true }
 ];
 
+const MENU_CATEGORY_PHOTOS = Object.freeze({
+  "Breakfast & Pastry": {
+    file: "images/menu/breakfast.jpg",
+    alt: "Full English style breakfast plate at Tawala Café",
+    focus: "50% 40%",
+    width: 736,
+    height: 981,
+    subtitle: "A generous start to the day."
+  },
+  "Hot Drinks": {
+    file: "images/menu/drinks.jpg",
+    alt: "Cappuccino with latte art at Tawala Café",
+    focus: "50% 42%",
+    width: 736,
+    height: 1104,
+    subtitle: "Coffee, tea and something warm."
+  },
+  "Lunch & Dinner": {
+    file: "images/menu/lunch.jpg",
+    alt: "Shawarma wrap at Tawala Café",
+    focus: "50% 42%",
+    width: 673,
+    height: 1200,
+    subtitle: "From the grill, made to share."
+  },
+  Desserts: {
+    file: "images/menu/desserts.jpg",
+    alt: "Ice cream sundae dessert at Tawala Café",
+    focus: "50% 42%",
+    width: 736,
+    height: 1308,
+    subtitle: "A sweet finish to your meal."
+  },
+  "Juices & Mocktails": {
+    file: "images/menu/juice.jpg",
+    alt: "Fresh orange juice at Tawala Café",
+    focus: "50% 42%",
+    width: 810,
+    height: 1440,
+    subtitle: "Fresh, fruity and made to refresh."
+  },
+  "Soda & Water": {
+    file: "images/menu/soda.jpg",
+    alt: "Cold sodas with ice at Tawala Café",
+    focus: "50% 42%",
+    width: 736,
+    height: 1104,
+    subtitle: "Something cool to go with it."
+  }
+});
+
+const MENU_CATEGORY_ICONS = Object.freeze({
+  "Breakfast & Pastry": ["M3 12h18", "M5 12a7 7 0 0 1 14 0", "M5 16h14"],
+  "Hot Drinks": ["M5 7h12v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7Z", "M17 10h2a2 2 0 0 1 0 4h-2", "M8 4v1", "M12 4v1"],
+  "Lunch & Dinner": ["M6 3v7", "M3.5 3v4a2.5 2.5 0 0 0 5 0V3", "M6 10v11", "M16 3v18", "M16 3c3 2 3 6 0 8"],
+  Desserts: ["M4 11h16l-2 9H6l-2-9Z", "M6 11a6 6 0 0 1 12 0", "M12 3v2"],
+  "Juices & Mocktails": ["M5 5h14l-2 16H7L5 5Z", "M9 9h6", "M12 5V2"],
+  "Soda & Water": ["M6 6h12l-1.5 15h-9L6 6Z", "M9 2l6 4", "M9 10h6"]
+});
+
+const KNOWN_MENU_IMAGES = Object.freeze({
+  shawarma: "images/shawarma.jpg",
+  "cheesy-loaded-fries": "images/loaded-fries.jpg",
+  "bbq-wings-6-pcs": "images/wings.jpg",
+  "beef-burger": "images/burger.jpg"
+});
+
+menuItems.forEach((item) => {
+  if (!item.image && KNOWN_MENU_IMAGES[item.id]) {
+    item.image = KNOWN_MENU_IMAGES[item.id];
+  }
+});
+
+function addIllustrativeImageLabel(container, item) {
+  if (item.imageIllustrative !== true) {
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.className = "dish-image__label";
+  label.textContent = "Illustrative image";
+  container.append(label);
+}
+
+function createDishImage(item, { className, width, height, onError }) {
+  const image = document.createElement("img");
+  image.className = className;
+  image.alt = `${item.name} at Tawala Café`;
+  image.width = width;
+  image.height = height;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.addEventListener("error", () => onError(image), { once: true });
+  image.src = item.image;
+  return image;
+}
+
 const header = document.querySelector(".header");
 const nav = document.querySelector(".nav");
 const navToggle = document.querySelector(".nav__toggle");
@@ -126,6 +228,41 @@ function cleanWhatsAppNumber(value) {
 function formatMenuPrice(price) {
   return `KSh ${new Intl.NumberFormat("en-KE").format(price)}`;
 }
+
+function renderPaymentConfig() {
+  document.querySelectorAll("[data-payment-till-number]").forEach((element) => {
+    element.textContent = CONFIG.tillNumber;
+  });
+  document.querySelectorAll("[data-payment-method]").forEach((element) => {
+    element.textContent = CONFIG.paymentMethod;
+  });
+
+  const tillNameNote = document.querySelector("[data-payment-till-name-note]");
+  if (isConfigured(CONFIG.tillName)) {
+    tillNameNote.textContent = `Check that the name shown matches ${CONFIG.tillName} before you pay.`;
+    tillNameNote.hidden = false;
+  }
+}
+
+renderPaymentConfig();
+
+let selectedPaymentMethod = "cash";
+
+function syncPaymentChoice(method = selectedPaymentMethod) {
+  selectedPaymentMethod = method === "mpesa" ? "mpesa" : "cash";
+  document.querySelectorAll("[data-payment-choice]").forEach((input) => {
+    input.checked = input.value === selectedPaymentMethod;
+    input.closest(".payment-choice__option").classList.toggle("is-selected", input.checked);
+  });
+  document.querySelectorAll("[data-mpesa-details]").forEach((details) => {
+    details.hidden = selectedPaymentMethod !== "mpesa";
+  });
+  document.querySelectorAll("[data-payment-reminder]").forEach((reminder) => {
+    reminder.hidden = selectedPaymentMethod !== "mpesa";
+  });
+}
+
+syncPaymentChoice();
 
 function buildOrderMessage(items, details = {}) {
   if (!Array.isArray(items) || items.length === 0) {
@@ -183,12 +320,17 @@ function buildOrderMessage(items, details = {}) {
     lines.push(`Notes: ${instructions}`);
   }
 
-  const payment = !orderType
-    ? "at the counter or on delivery"
-    : orderType.toLowerCase() === "delivery"
-      ? "on delivery"
-      : "at the counter";
-  lines.push(`Payment: ${payment}`);
+  if (details.paymentMethod === "mpesa") {
+    lines.push(`💳 Payment: M-Pesa Till ${CONFIG.tillNumber} (${formatMenuPrice(total)})`);
+    lines.push("I will send the M-Pesa confirmation message.");
+  } else {
+    const payment = !orderType
+      ? "at the counter or on delivery"
+      : orderType.toLowerCase() === "delivery"
+        ? "on delivery"
+        : "at the counter";
+    lines.push(`Payment: ${payment}`);
+  }
   return lines.join("\n");
 }
 
@@ -391,44 +533,129 @@ const menuCategories = [
   "Soda & Water"
 ];
 
-function createMenuItem(item) {
+menuTabs.forEach((tab) => {
+  const category = tab.dataset.menuCategory;
+  const photo = MENU_CATEGORY_PHOTOS[category];
+  if (!photo) {
+    return;
+  }
+
+  const label = document.createElement("span");
+  label.textContent = tab.textContent;
+  const thumbnail = document.createElement("img");
+  thumbnail.className = "menu__tab-thumbnail";
+  thumbnail.src = photo.file.replace(/\.jpg$/i, "-thumb.webp");
+  thumbnail.alt = "";
+  thumbnail.width = 32;
+  thumbnail.height = 32;
+  thumbnail.loading = "lazy";
+  thumbnail.decoding = "async";
+  thumbnail.onerror = () => {
+    thumbnail.onerror = () => {
+      thumbnail.hidden = true;
+    };
+    thumbnail.src = photo.file;
+  };
+  tab.replaceChildren(thumbnail, label);
+});
+
+function createMenuCategoryPhoto(category, photo) {
+  const figure = document.createElement("figure");
+  figure.className = "menu__category-photo";
+  figure.dataset.menuCategoryPhoto = category;
+
+  const picture = document.createElement("picture");
+  picture.className = "menu__category-picture";
+  const source = document.createElement("source");
+  source.type = "image/webp";
+  source.srcset = photo.file.replace(/\.jpg$/i, ".webp");
+
+  const image = document.createElement("img");
+  image.src = photo.file;
+  image.alt = photo.alt;
+  image.width = photo.width;
+  image.height = photo.height;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.style.objectPosition = photo.focus;
+  image.onerror = () => {
+    if (picture.querySelector("source")) {
+      picture.querySelector("source").remove();
+      return;
+    }
+
+    const fallback = document.createElement("span");
+    fallback.className = "menu__category-photo-fallback";
+    fallback.textContent = category;
+    fallback.setAttribute("role", "img");
+    fallback.setAttribute("aria-label", photo.alt);
+    picture.replaceChildren(fallback);
+  };
+  picture.append(source, image);
+
+  const label = document.createElement("figcaption");
+  label.className = "menu__category-photo-label";
+  label.textContent = "Illustrative image";
+  figure.append(picture, label);
+  return figure;
+}
+
+function createMenuCategoryIcon(category) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.classList.add("menu__category-icon");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+
+  for (const pathData of MENU_CATEGORY_ICONS[category] ?? []) {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", pathData);
+    path.setAttribute("stroke", "currentColor");
+    path.setAttribute("stroke-width", "1.5");
+    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("stroke-linejoin", "round");
+    svg.append(path);
+  }
+
+  return svg;
+}
+
+function createMenuItem(item, index) {
   const listItem = document.createElement("li");
   listItem.className = "menu__item";
   listItem.dataset.menuItem = item.id;
   listItem.dataset.orderItem = item.id;
-  listItem.setAttribute("role", "button");
   listItem.setAttribute("tabindex", "0");
-  listItem.setAttribute("aria-label", `Order ${item.name}`);
+  listItem.setAttribute("aria-label", `View details and ordering options for ${item.name}`);
   if (item.available === false) {
     listItem.classList.add("menu__item--unavailable");
   }
 
-  if (item.image) {
+  const itemNumber = document.createElement("span");
+  itemNumber.className = "menu__item-number";
+  itemNumber.textContent = String(index + 1).padStart(2, "0");
+  itemNumber.setAttribute("aria-hidden", "true");
+  listItem.append(itemNumber);
+
+  if (SHOW_DISH_PHOTOS && item.image) {
     const media = document.createElement("span");
     media.className = "menu__item-media";
-
-    const image = document.createElement("img");
-    image.className = "menu__item-image";
-    image.src = item.image;
-    image.alt = "";
-    image.width = 64;
-    image.height = 64;
-    image.loading = "lazy";
-    const placeholder = document.createElement("span");
-    placeholder.className = "menu__item-image-placeholder";
-    placeholder.textContent = item.name.charAt(0);
-    placeholder.hidden = true;
-    image.addEventListener("error", () => {
-      image.hidden = true;
-      placeholder.hidden = false;
-    }, { once: true });
-    media.append(image, placeholder);
+    media.append(createDishImage(item, {
+      className: "menu__item-image",
+      width: 88,
+      height: 88,
+      onError: () => media.remove()
+    }));
+    addIllustrativeImageLabel(media, item);
     listItem.append(media);
   }
 
   const details = document.createElement("div");
   details.className = "menu__item-details";
 
+  const titleRow = document.createElement("div");
+  titleRow.className = "menu__item-title-row";
   const title = document.createElement("div");
   title.className = "menu__item-title";
 
@@ -443,24 +670,33 @@ function createMenuItem(item) {
     badge.textContent = "Popular";
     title.append(badge);
   }
-  details.append(title);
 
-  if (item.description) {
-    const description = document.createElement("p");
-    description.className = "menu__item-description";
-    description.textContent = item.description;
-    details.append(description);
+  if (item.isNew) {
+    const badge = document.createElement("span");
+    badge.className = "menu__item-badge menu__item-badge--new";
+    badge.textContent = "New";
+    title.append(badge);
   }
+
+  if (item.available === false) {
+    const status = document.createElement("span");
+    status.className = "menu__item-status";
+    status.textContent = "Sold out";
+    title.append(status);
+  }
+
+  const leader = document.createElement("span");
+  leader.className = "menu__item-leader";
+  leader.setAttribute("aria-hidden", "true");
 
   const optionPrice = document.createElement("p");
   optionPrice.className = "menu__item-price";
-  optionPrice.textContent = `KSh ${new Intl.NumberFormat("en-KE").format(item.price)}`;
+  optionPrice.textContent = `KSh ${new Intl.NumberFormat("en-KE").format(item.options?.[0]?.price ?? item.price)}`;
   const pricePill = document.createElement("span");
   pricePill.className = "menu__item-price-pill";
   pricePill.append(optionPrice);
-  const accent = document.createElement("span");
-  accent.className = "menu__item-accent";
-  accent.setAttribute("aria-hidden", "true");
+  titleRow.append(title, leader, pricePill);
+  details.append(titleRow);
 
   if (item.options?.length) {
     const options = document.createElement("div");
@@ -486,16 +722,30 @@ function createMenuItem(item) {
     details.append(options);
   }
 
-  const priceRow = document.createElement("div");
-  priceRow.className = "menu__item-price-row";
-  const orderHint = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  orderHint.classList.add("menu__item-order-hint");
-  orderHint.setAttribute("viewBox", "0 0 24 24");
-  orderHint.setAttribute("aria-hidden", "true");
-  orderHint.innerHTML = '<path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
-  listItem.append(accent);
-  priceRow.append(pricePill, orderHint);
-  listItem.append(details, priceRow);
+  if (item.description) {
+    const description = document.createElement("p");
+    description.className = "menu__item-description";
+    description.textContent = item.description;
+    details.append(description);
+  }
+
+  const addButton = document.createElement("button");
+  addButton.className = "menu__item-add";
+  addButton.type = "button";
+  addButton.dataset.menuAdd = item.id;
+  addButton.disabled = item.available === false;
+  addButton.setAttribute("aria-label", `Add ${item.name} to order`);
+  const addIcon = document.createElement("span");
+  addIcon.className = "menu__item-add-icon";
+  addIcon.textContent = "+";
+  addIcon.setAttribute("aria-hidden", "true");
+  const addedIcon = document.createElement("span");
+  addedIcon.className = "menu__item-add-feedback";
+  addedIcon.textContent = "✓";
+  addedIcon.setAttribute("aria-hidden", "true");
+  addButton.append(addIcon, addedIcon);
+
+  listItem.append(details, addButton);
   return listItem;
 }
 
@@ -524,10 +774,29 @@ function renderMenuItems(items) {
     heading.className = "menu__category-heading";
     heading.textContent = category;
 
+    const photo = MENU_CATEGORY_PHOTOS[category];
+    const categoryHeader = document.createElement("header");
+    categoryHeader.className = "menu__category-header";
+    const categoryCopy = document.createElement("div");
+    categoryCopy.className = "menu__category-copy";
+    const headingRow = document.createElement("div");
+    headingRow.className = "menu__category-title-row";
+    headingRow.append(createMenuCategoryIcon(category), heading);
+    categoryCopy.append(headingRow);
+
+    const subtitle = document.createElement("p");
+    subtitle.className = "menu__category-subtitle";
+    subtitle.textContent = photo.subtitle;
+    const dishCount = document.createElement("p");
+    dishCount.className = "menu__category-count";
+    dishCount.textContent = `${categoryItems.length} ${categoryItems.length === 1 ? "dish" : "dishes"}`;
+    categoryCopy.append(subtitle, dishCount);
+    categoryHeader.append(categoryCopy, createMenuCategoryPhoto(category, photo));
+
     const list = document.createElement("ul");
     list.className = "menu__items";
-    categoryItems.forEach((item) => list.append(createMenuItem(item)));
-    categorySection.append(heading, list);
+    categoryItems.forEach((item, index) => list.append(createMenuItem(item, index)));
+    categorySection.append(categoryHeader, list);
     menuResults.append(categorySection);
   });
 }
@@ -730,6 +999,9 @@ function renderOrder() {
   orderBarCount.textContent = `${quantity} ${quantity === 1 ? "dish" : "dishes"}`;
   orderBarTotal.textContent = formatMenuPrice(total);
   orderDialogTotal.textContent = formatMenuPrice(total);
+  orderDialog.querySelectorAll("[data-payment-order-total]").forEach((element) => {
+    element.textContent = formatMenuPrice(total);
+  });
   orderDialogEmpty.hidden = lines.length !== 0;
   orderSendWhatsApp.disabled = lines.length === 0;
   orderClear.disabled = lines.length === 0;
@@ -792,6 +1064,34 @@ function addActiveDishToOrder(closeDialog = true) {
   if (closeDialog) {
     dishDialog.close();
   }
+}
+
+function addMenuItemToOrder(item, option, button) {
+  if (!item || item.available === false) {
+    return;
+  }
+
+  const optionLabel = option?.label ?? "";
+  const existingLine = orderItems.find((line) => line.id === item.id && line.option === optionLabel);
+  if (existingLine) {
+    existingLine.quantity = Math.min(20, existingLine.quantity + 1);
+  } else {
+    orderItems.push({ id: item.id, option: optionLabel, quantity: 1 });
+  }
+  saveCart(orderItems);
+  renderOrder();
+
+  button.disabled = true;
+  button.classList.add("is-added");
+  button.setAttribute("aria-label", `${item.name} added to order`);
+  window.setTimeout(() => {
+    if (!button.isConnected) {
+      return;
+    }
+    button.classList.remove("is-added");
+    button.disabled = false;
+    button.setAttribute("aria-label", `Add ${item.name} to order`);
+  }, 1000);
 }
 
 function openWhatsAppLink(url, fallback, fallbackLink) {
@@ -957,6 +1257,9 @@ function showCartChoiceDetails(choice, orderLines) {
   const total = resolvedLines.reduce((sum, line) => sum + line.price * line.quantity, 0);
   cartChoiceItemsCount.textContent = `${totalCount} ${totalCount === 1 ? "item" : "items"}`;
   cartChoiceOrderTotal.textContent = formatMenuPrice(total);
+  cartChoiceStepTwo.querySelectorAll("[data-payment-order-total]").forEach((element) => {
+    element.textContent = formatMenuPrice(total);
+  });
   cartChoiceSteps.classList.add("cart-choice-dialog__steps--details");
   cartChoiceStepOne.classList.remove("is-active");
   cartChoiceStepTwo.classList.add("is-active");
@@ -989,6 +1292,7 @@ function readOrderDetails() {
   const type = orderType.value;
   return {
     orderType: type,
+    paymentMethod: selectedPaymentMethod,
     name: orderCustomerName.value,
     tableNumber: type === "Dine in" ? orderTableNumber.value : "",
     location: type === "Delivery" ? orderLocation.value : "",
@@ -1003,27 +1307,7 @@ function getWhatsAppOrder(orderLines, customerDetails = {}) {
 
 async function copyWhatsAppMessage(message, feedback) {
   try {
-    if (navigator.clipboard?.writeText) {
-      try {
-        await navigator.clipboard.writeText(message);
-        feedback.textContent = "Copied";
-        feedback.hidden = false;
-        return;
-      } catch {
-        // Use the legacy clipboard path for browsers that deny the async API.
-      }
-    }
-    const temporaryInput = document.createElement("textarea");
-    temporaryInput.value = message;
-    temporaryInput.setAttribute("readonly", "");
-    temporaryInput.className = "order-copy-buffer";
-    document.body.append(temporaryInput);
-    temporaryInput.select();
-    const copied = document.execCommand("copy");
-    temporaryInput.remove();
-    if (!copied) {
-      throw new Error("The browser did not allow copying the order text.");
-    }
+    await copyTextWithFallback(message);
     feedback.textContent = "Copied";
     feedback.hidden = false;
   } catch (error) {
@@ -1032,6 +1316,50 @@ async function copyWhatsAppMessage(message, feedback) {
     console.error("Unable to copy WhatsApp order text.", error);
   }
 }
+
+async function copyTextWithFallback(text) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // Use the legacy clipboard path for browsers that deny the async API.
+    }
+  }
+
+  const temporaryInput = document.createElement("textarea");
+  temporaryInput.value = text;
+  temporaryInput.setAttribute("readonly", "");
+  temporaryInput.className = "order-copy-buffer";
+  document.body.append(temporaryInput);
+  temporaryInput.select();
+  try {
+    if (!document.execCommand("copy")) {
+      throw new Error("The browser did not allow copying the text.");
+    }
+  } finally {
+    temporaryInput.remove();
+  }
+}
+
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-copy-till-number]");
+  if (!button) {
+    return;
+  }
+
+  const feedback = button.parentElement.querySelector("[data-copy-feedback]");
+  feedback.hidden = true;
+  try {
+    await copyTextWithFallback(CONFIG.tillNumber);
+    feedback.textContent = "Copied";
+    feedback.hidden = false;
+  } catch (error) {
+    feedback.textContent = "Copy failed. Please copy the Till number manually.";
+    feedback.hidden = false;
+    console.error("Unable to copy the M-Pesa Till number.", error);
+  }
+});
 
 function updateDishDialogPrice() {
   dishDialogPrice.textContent = formatMenuPrice(activeDishPrice);
@@ -1043,28 +1371,22 @@ function updateDishDialogPrice() {
 
 function renderDishDialogMedia(item) {
   dishDialogMedia.replaceChildren();
+  dishDialogMedia.hidden = !item.image;
+  dishDialogPanel.classList.toggle("dish-dialog__panel--without-media", !item.image);
   if (!item.image) {
-    const placeholder = document.createElement("span");
-    placeholder.className = "dish-dialog__placeholder";
-    placeholder.textContent = item.name.charAt(0);
-    placeholder.setAttribute("aria-hidden", "true");
-    dishDialogMedia.append(placeholder);
     return;
   }
 
-  const image = document.createElement("img");
-  image.src = item.image;
-  image.alt = "";
-  image.width = 120;
-  image.height = 120;
-  image.addEventListener("error", () => {
-    const placeholder = document.createElement("span");
-    placeholder.className = "dish-dialog__placeholder";
-    placeholder.textContent = item.name.charAt(0);
-    placeholder.setAttribute("aria-hidden", "true");
-    image.replaceWith(placeholder);
-  }, { once: true });
-  dishDialogMedia.append(image);
+  dishDialogMedia.append(createDishImage(item, {
+    className: "dish-dialog__image",
+    width: 640,
+    height: 480,
+    onError: () => {
+      dishDialogMedia.hidden = true;
+      dishDialogPanel.classList.add("dish-dialog__panel--without-media");
+    }
+  }));
+  addIllustrativeImageLabel(dishDialogMedia, item);
 }
 
 function openDishDialog(item, opener) {
@@ -1122,6 +1444,24 @@ function openDishDialog(item, opener) {
   syncModalBodyLock();
   dishDialog.querySelector(".dish-dialog__close").focus();
 }
+
+menuResults.addEventListener("click", (event) => {
+  const addButton = event.target.closest("[data-menu-add]");
+  if (!addButton) {
+    return;
+  }
+
+  const item = menuItems.find((menuItem) => menuItem.id === addButton.dataset.menuAdd);
+  const itemElement = addButton.closest("[data-order-item]");
+  if (!item || !itemElement) {
+    return;
+  }
+
+  const selectedOptionIndex = [...itemElement.querySelectorAll(".menu__item-option")]
+    .findIndex((optionButton) => optionButton.getAttribute("aria-pressed") === "true");
+  const selectedOption = item.options?.[selectedOptionIndex] ?? item.options?.[0] ?? null;
+  addMenuItemToOrder(item, selectedOption, addButton);
+});
 
 menuResults.addEventListener("click", (event) => {
   const itemElement = event.target.closest("[data-order-item]");
@@ -1332,7 +1672,15 @@ cartChoiceTypeOptions.forEach((button) => {
   });
 });
 
-cartChoiceSend.addEventListener("click", async () => {
+document.querySelectorAll("[data-payment-choice]").forEach((input) => {
+  input.addEventListener("change", () => {
+    if (input.checked) {
+      syncPaymentChoice(input.value);
+    }
+  });
+});
+
+cartChoiceSend.addEventListener("click", () => {
   if (!cartChoiceStepTwo.classList.contains("is-active")) {
     return;
   }
@@ -1345,6 +1693,7 @@ cartChoiceSend.addEventListener("click", async () => {
   }
   const details = {
     orderType: type,
+    paymentMethod: selectedPaymentMethod,
     location: type === "Delivery" ? cartChoiceLocation.value.trim() : "",
     pickupTime: type === "Pickup" ? cartChoicePickupTime.value : "",
     tableNumber: type === "Dine in" ? cartChoiceTable.value.trim() : "",
@@ -1368,17 +1717,15 @@ cartChoiceSend.addEventListener("click", async () => {
     cartChoiceCopied.hidden = true;
     cartChoiceSend.classList.add("is-sending");
     cartChoiceSend.setAttribute("aria-disabled", "true");
-    await new Promise((resolve) => window.setTimeout(resolve, 450));
+    openWhatsAppLink(order.url, cartChoiceFallback, cartChoiceFallbackLink);
     cartChoiceSend.classList.remove("is-sending");
     cartChoiceSend.classList.add("is-sent");
-    await new Promise((resolve) => window.setTimeout(resolve, 300));
     if (pendingCartChoice === "add-all") {
       addActiveDishToOrder(false);
       orderItems = [];
       clearCart();
       renderOrder();
     }
-    openWhatsAppLink(order.url, cartChoiceFallback, cartChoiceFallbackLink);
     finishCartChoice({ choice: pendingCartChoice, details, sent: true });
   } catch (error) {
     cartChoiceValidation.textContent = "Unable to prepare this order. Please try again.";

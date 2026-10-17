@@ -28,6 +28,7 @@
             "image": "https://tawalacafe.co.ke/images/caffe.jpeg",
             "url": "https://tawalacafe.co.ke/",
             "telephone": "+254703789777",
+            "paymentAccepted": "Cash, M-Pesa",
             "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "Utawala, Astrol, Eastern Bypass",
@@ -244,6 +245,24 @@
                                 </div>
                             </fieldset>
 
+                            <fieldset class="payment-choice" aria-labelledby="cart-choice-payment-title">
+                                <legend id="cart-choice-payment-title">Payment</legend>
+                                <label class="payment-choice__option">
+                                    <input type="radio" name="cart-choice-payment" value="cash" data-payment-choice="cash" checked>
+                                    <span>Pay cash (at the counter or on delivery)</span>
+                                </label>
+                                <label class="payment-choice__option">
+                                    <input type="radio" name="cart-choice-payment" value="mpesa" data-payment-choice="mpesa">
+                                    <span>Pay with M-Pesa Till <span data-payment-till-number></span></span>
+                                </label>
+                                <div class="payment-choice__details" data-mpesa-details hidden>
+                                    <p>Pay via <span data-payment-method></span>.</p>
+                                    <p class="payment-choice__amount">Order total <strong data-payment-order-total>KSh 0</strong></p>
+                                    <button class="payment-choice__copy" type="button" data-copy-till-number>Copy Till number</button>
+                                    <span class="payment-choice__feedback" data-copy-feedback role="status" aria-live="polite" hidden></span>
+                                </div>
+                            </fieldset>
+
                             <label class="cart-choice-dialog__field">
                                 <span>Name (optional)</span>
                                 <input id="cart-choice-name" type="text" autocomplete="name" placeholder="Your name">
@@ -290,6 +309,7 @@
                                 <span class="cart-choice-dialog__send-spinner" aria-hidden="true"></span>
                                 <span class="cart-choice-dialog__send-check" aria-hidden="true">✓</span>
                             </button>
+                            <p class="payment-choice__reminder" data-payment-reminder hidden>After paying, send the M-Pesa confirmation message in WhatsApp so we can confirm your order.</p>
                             <div class="dish-dialog__whatsapp-fallback" id="cart-choice-whatsapp-fallback" hidden>
                                 <a class="dish-dialog__fallback-link" id="cart-choice-fallback-link" href="#" target="_blank" rel="noopener">WhatsApp did not open? Tap here</a>
                                 <button class="dish-dialog__copy" id="cart-choice-copy" type="button">Copy order text</button>
@@ -336,6 +356,24 @@
                         </select>
                     </div>
 
+                    <fieldset class="payment-choice order-dialog__payment" aria-labelledby="order-payment-title">
+                        <legend id="order-payment-title">Payment</legend>
+                        <label class="payment-choice__option">
+                            <input type="radio" name="order-dialog-payment" value="cash" data-payment-choice="cash" checked>
+                            <span>Pay cash (at the counter or on delivery)</span>
+                        </label>
+                        <label class="payment-choice__option">
+                            <input type="radio" name="order-dialog-payment" value="mpesa" data-payment-choice="mpesa">
+                            <span>Pay with M-Pesa Till <span data-payment-till-number></span></span>
+                        </label>
+                        <div class="payment-choice__details" data-mpesa-details hidden>
+                            <p>Pay via <span data-payment-method></span>.</p>
+                            <p class="payment-choice__amount">Order total <strong data-payment-order-total>KSh 0</strong></p>
+                            <button class="payment-choice__copy" type="button" data-copy-till-number>Copy Till number</button>
+                            <span class="payment-choice__feedback" data-copy-feedback role="status" aria-live="polite" hidden></span>
+                        </div>
+                    </fieldset>
+
                     <label class="order-dialog__field" id="order-table-field">
                         <span class="order-dialog__label">Table number</span>
                         <input id="order-table-number" type="text" inputmode="numeric">
@@ -354,6 +392,7 @@
 
                 <footer class="order-dialog__footer">
                     <button class="btn order-dialog__send" id="order-send-whatsapp" type="button">Send order on WhatsApp</button>
+                    <p class="payment-choice__reminder" data-payment-reminder hidden>After paying, send the M-Pesa confirmation message in WhatsApp so we can confirm your order.</p>
                     <p class="dish-dialog__order-empty" id="order-empty-message" role="status" hidden>Your order is empty. Pick a dish first.</p>
                     <div class="dish-dialog__whatsapp-fallback" id="order-whatsapp-fallback" hidden>
                         <a class="dish-dialog__fallback-link" id="order-fallback-link" href="#" target="_blank" rel="noopener">WhatsApp did not open? Tap here</a>
@@ -392,6 +431,46 @@
                 <h2 class="section__heading" id="contact-heading">Let's make it a good meal.</h2>
                 <p class="contact__copy">Find us in Nairobi or get in touch to start your order. We can't wait to welcome you.</p>
                 <p class="contact__location" data-config-value="address" hidden></p>
+                <section class="payment-card" aria-labelledby="payment-card-title">
+                    <div class="payment-card__heading">
+                        <span class="payment-card__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" focusable="false">
+                                <rect x="5" y="2.5" width="14" height="19" rx="2.5" stroke="currentColor" stroke-width="1.6"/>
+                                <path d="M9 5.5h6M10 18.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                <path d="M8.5 10.5h7M8.5 13.5h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <p class="section__eyebrow">Simple and secure</p>
+                            <h3 id="payment-card-title">Pay with M-Pesa</h3>
+                        </div>
+                    </div>
+                    <p class="payment-card__method" data-payment-method></p>
+                    <p class="payment-card__till-label">Till number</p>
+                    <p class="payment-card__till-number" data-payment-till-number></p>
+                    <div class="payment-card__copy-row">
+                        <button class="payment-choice__copy" type="button" data-copy-till-number>Copy Till number</button>
+                        <span class="payment-choice__feedback" data-copy-feedback role="status" aria-live="polite" hidden></span>
+                    </div>
+                    <p class="payment-card__name-note" data-payment-till-name-note hidden></p>
+                    <ol class="payment-card__steps">
+                        <li>Open M-Pesa on your phone.</li>
+                        <li>Choose Lipa na M-Pesa, then Buy Goods and Services.</li>
+                        <li>Enter Till Number <strong data-payment-till-number></strong>.</li>
+                        <li>Enter the amount from your order.</li>
+                        <li>Enter your PIN and confirm.</li>
+                    </ol>
+                    <p class="payment-card__cash-note">Cash is also accepted at the counter and on delivery.</p>
+                    <p class="payment-card__footer-line">Pay via M-Pesa Till <span data-payment-till-number></span></p>
+                </section>
+                <section class="how-to-order" aria-labelledby="how-to-order-title">
+                    <h3 id="how-to-order-title">How to order</h3>
+                    <ol>
+                        <li>Choose your dishes from the menu.</li>
+                        <li>Select dine in, pickup or delivery.</li>
+                        <li>Pay by M-Pesa Till or cash.</li>
+                    </ol>
+                </section>
                 <a class="btn" href="#" data-whatsapp-link data-whatsapp-message="Hi Tawala Café, I'd like to place an order.">Start an order on WhatsApp</a>
             </div>
         </section>
@@ -432,6 +511,7 @@
                     </a>
                     <a class="footer__directions" href="https://maps.google.com/maps?cid=507293632078050263" target="_blank" rel="noopener noreferrer">Get directions</a>
                 </div>
+                <p class="footer__payment">Pay via M-Pesa Till <span data-payment-till-number></span></p>
             </div>
         </div>
         <div class="footer__bottom">
