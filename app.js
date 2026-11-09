@@ -223,6 +223,22 @@ function isConfigured(value) {
   return typeof value === "string" && value.trim() !== "" && !/^\[.*\]$/.test(value.trim());
 }
 
+function showGalleryImageFallback(image) {
+  const placeholder = image.parentElement?.querySelector(".gallery__placeholder");
+  if (!placeholder) {
+    return;
+  }
+  image.hidden = true;
+  placeholder.hidden = false;
+}
+
+document.querySelectorAll(".gallery__image").forEach((image) => {
+  image.addEventListener("error", () => showGalleryImageFallback(image), { once: true });
+  if (image.complete && image.naturalWidth === 0) {
+    showGalleryImageFallback(image);
+  }
+});
+
 function formatMenuPrice(price) {
   return `KSh ${new Intl.NumberFormat("en-KE").format(price)}`;
 }
