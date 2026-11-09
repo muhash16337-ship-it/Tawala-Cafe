@@ -4663,6 +4663,40 @@ button:focus-visible {
   margin-top: 0.35rem;
 }
 
+.menu__side-options {
+  margin-top: 0.45rem;
+}
+
+.menu__side-options .menu__item-option {
+  min-width: 4.1rem;
+  touch-action: manipulation;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.menu__side-options .menu__item-option[aria-pressed="true"] {
+  animation: menu-side-selected 220ms ease-out;
+}
+
+.menu__side-options.is-invalid .menu__item-option {
+  border-color: #f0d98a;
+  box-shadow: 0 0 0 1px rgb(212 175 55 / 30%);
+}
+
+.menu__side-options.is-invalid {
+  animation: menu-side-shake 360ms ease-in-out;
+}
+
+.menu__side-error,
+.dish-dialog__side-error {
+  margin: 0.35rem 0 0;
+  color: #f0d98a;
+  font-size: 0.78rem;
+}
+
+.dish-dialog__side-options-host {
+  margin-top: 0.5rem;
+}
+
 .menu__item-option {
   min-height: 2.75rem;
   border-color: var(--section-accent);
@@ -4762,9 +4796,15 @@ button:focus-visible {
   }
 
   .menu__item:hover .menu__item-price {
-    color: var(--section-accent-text);
+    color: var(--color-gold);
     text-shadow: none;
     transform: none;
+  }
+
+  .menu__item:hover .menu__item-price-pill,
+  .menu__item:focus-visible .menu__item-price-pill {
+    border-color: transparent;
+    background: transparent;
   }
 
   .menu__item-add:not(:disabled):hover {
@@ -4826,12 +4866,35 @@ button:focus-visible {
   .menu__item-name,
   .menu__item-add,
   .menu__item-add-icon,
-  .menu__item-add-feedback {
+  .menu__item-add-feedback,
+  .menu__side-options,
+  .menu__side-options .menu__item-option {
     transition: none;
+    animation: none;
   }
 
   .menu__item:hover,
   .menu__item-add:not(:disabled):hover {
     transform: none;
+  }
+}
+
+@keyframes menu-side-selected {
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes menu-side-shake {
+  25% {
+    transform: translateX(-4px);
+  }
+
+  50% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-2px);
   }
 }
