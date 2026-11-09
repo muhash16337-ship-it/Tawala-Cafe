@@ -626,6 +626,23 @@ function updateDishChoiceFeedback(item, container) {
         : "";
     error.hidden = missingChoices.length === 0;
   }
+  if (activeDish?.id === item.id) {
+    syncDishDialogChoiceState(item, missingChoices);
+  }
+}
+
+function syncDishDialogChoiceState(item, missingChoices = getMissingDishChoices(item)) {
+  const hasChoices = Boolean(item.sides?.length || item.includesSoda || item.sodaChoice);
+  dishDialogAdd.disabled = item.available === false || missingChoices.length > 0;
+  dishDialogAdd.textContent = hasChoices ? "Add to order" : "Add another dish";
+  dishDialogChoiceHelper.hidden = !hasChoices || missingChoices.length === 0;
+  if (!hasChoices || missingChoices.length === 0) {
+    dishDialogChoiceHelper.textContent = "";
+    return;
+  }
+  dishDialogChoiceHelper.textContent = missingChoices.length === 2
+    ? "Choose your side and soda to continue"
+    : `Choose ${missingChoices[0] === "your soda" ? "your soda" : "your side"} to continue`;
 }
 
 function syncDishSideSelection(item, side) {
@@ -682,6 +699,11 @@ function createSideChoiceGroup(item, { dialog = false } = {}) {
   group.setAttribute("role", "group");
   group.setAttribute("aria-label", `Choose a side for ${item.name}`);
 
+  const heading = document.createElement("span");
+  heading.className = "menu__choice-step";
+  heading.textContent = "Choose your side";
+  group.append(heading);
+
   item.sides.forEach((side) => {
     const button = document.createElement("button");
     button.className = "menu__item-option";
@@ -709,12 +731,10 @@ function createSodaChoiceGroup(item, { dialog = false } = {}) {
   group.setAttribute("role", "group");
   group.setAttribute("aria-label", item.sodaChoice ? "Choose your soda flavour" : `Choose a soda for ${item.name}`);
 
-  if (item.includesSoda || item.sodaChoice) {
-    const title = document.createElement("span");
-    title.className = "menu__soda-label";
-    title.textContent = "Choose your soda";
-    group.append(title);
-  }
+  const title = document.createElement("span");
+  title.className = "menu__choice-step";
+  title.textContent = "Choose your soda";
+  group.append(title);
 
   SODA_FLAVOURS.forEach(({ brand, items }) => {
     const brandGroup = document.createElement("div");
@@ -868,6 +888,9 @@ function createMenuCategoryIcon(category) {
 function createMenuItem(item, index) {
   const listItem = document.createElement("li");
   listItem.className = "menu__item";
+  if (item.options?.length && !item.sodaChoice) {
+    listItem.classList.add("menu__item--has-options");
+  }
   listItem.dataset.menuItem = item.id;
   listItem.dataset.orderItem = item.id;
   listItem.setAttribute("tabindex", "0");
@@ -942,7 +965,7 @@ function createMenuItem(item, index) {
   titleRow.append(title, leader, pricePill);
   details.append(titleRow);
 
-  if (item.options?.length) {
+  if (item.options?.length && !item.sodaChoice) {
     const options = document.createElement("div");
     options.className = "menu__item-options";
     options.setAttribute("role", "group");
@@ -964,22 +987,6 @@ function createMenuItem(item, index) {
     });
 
     details.append(options);
-  }
-
-  if (item.sides?.length) {
-    details.append(createSideChoiceGroup(item));
-  }
-
-  if (item.includesSoda || item.sodaChoice) {
-    details.append(createSodaChoiceGroup(item));
-  }
-
-  if (item.sides?.length || item.includesSoda || item.sodaChoice) {
-    const choiceError = document.createElement("p");
-    choiceError.className = "menu__side-error menu__choice-error";
-    choiceError.setAttribute("role", "status");
-    choiceError.hidden = true;
-    details.append(choiceError);
   }
 
   if (item.description) {
@@ -1102,6 +1109,7 @@ const dishDialogContent = document.querySelector(".dish-dialog__content");
 const dishDialogSideHost = document.querySelector("#dish-dialog-side-options");
 const dishDialogSodaHost = document.querySelector("#dish-dialog-soda-options");
 const dishDialogChoiceError = document.querySelector("#dish-dialog-choice-error");
+const dishDialogChoiceHelper = document.querySelector("#dish-dialog-choice-helper");
 let dishDialogSideOptions = null;
 let dishDialogSodaOptions = null;
 const dishDialogPrice = document.querySelector("#dish-dialog-price");
@@ -1766,6 +1774,10 @@ function openDishDialog(item, opener) {
   dishDialogSodaHost.hidden = !(item.includesSoda || item.sodaChoice);
   dishDialogSideOptions = null;
   dishDialogSodaOptions = null;
+  selectedDishSides.delete(item.id);
+  selectedDishSodas.delete(item.id);
+  activeDishSide = "";
+  activeDishSoda = "";
   if (item.sides?.length) {
     dishDialogSideOptions = createSideChoiceGroup(item, { dialog: true });
     dishDialogSideHost.append(dishDialogSideOptions);
@@ -1780,11 +1792,13 @@ function openDishDialog(item, opener) {
   dishDialogUnavailable.hidden = item.available !== false;
   dishDialogOrder.disabled = item.available === false;
   dishDialogAdd.disabled = item.available === false;
+  dishDialogChoiceHelper.hidden = true;
+  dishDialogChoiceHelper.textContent = "";
 
   if (item.options?.length) {
     const groupLabel = document.createElement("span");
     groupLabel.className = "dish-dialog__options-label";
-    groupLabel.textContent = "Choose an option";
+    groupLabel.textContent = item.sodaChoice ? "Choose your size" : "Choose an option";
     const group = document.createElement("div");
     group.className = "dish-dialog__option-list";
     group.setAttribute("role", "group");
@@ -1809,6 +1823,7 @@ function openDishDialog(item, opener) {
     dishDialogOptions.append(groupLabel, group);
   }
 
+  syncDishDialogChoiceState(item);
   updateDishDialogPrice();
   dishDialog.showModal();
   syncModalBodyLock();
@@ -1827,7 +1842,8 @@ menuResults.addEventListener("click", (event) => {
     return;
   }
 
-  if (!requireDishSelections(item, itemElement, itemElement.querySelector(".menu__choice-error"))) {
+  if (item.sides?.length || item.includesSoda || item.sodaChoice) {
+    openDishDialog(item, itemElement);
     return;
   }
 
