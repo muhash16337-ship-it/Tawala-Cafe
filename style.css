@@ -3161,6 +3161,93 @@ button:focus-visible {
   font-weight: 700;
 }
 
+.order-bar__summary .order-bar__packaging-note {
+  color: rgb(246 240 226 / 60%);
+  font-size: 0.68rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.order-dialog__subtotal,
+.order-dialog__packaging,
+.cart-choice-dialog__pricing p {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.order-dialog__subtotal {
+  margin-bottom: 0.25rem;
+}
+
+.order-dialog__packaging {
+  margin: 0.2rem 0 0.35rem;
+  color: rgb(246 240 226 / 74%);
+  font-size: 0.82rem;
+}
+
+.order-dialog__packaging[hidden],
+.cart-choice-dialog__packaging[hidden] {
+  display: none;
+}
+
+.order-dialog__packaging strong,
+.cart-choice-dialog__pricing strong {
+  color: var(--color-gold-light);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.order-dialog__packaging-note,
+.cart-choice-dialog__packaging-note {
+  margin: 0.4rem 0 0;
+  color: rgb(246 240 226 / 58%);
+  font-size: 0.72rem;
+  letter-spacing: normal;
+  line-height: 1.4;
+  text-transform: none;
+}
+
+.order-dialog__total {
+  border-top: 1px solid rgb(201 162 74 / 25%);
+  padding-top: 0.7rem;
+}
+
+.cart-choice-dialog__pricing {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0.75rem 0;
+  border: 1px solid rgb(201 162 74 / 24%);
+  border-radius: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  color: rgb(246 240 226 / 74%);
+  font-size: 0.8rem;
+}
+
+.cart-choice-dialog__pricing p {
+  margin: 0;
+}
+
+.cart-choice-dialog__pricing .cart-choice-dialog__total {
+  border-top: 1px solid rgb(201 162 74 / 24%);
+  padding-top: 0.4rem;
+  color: var(--color-ivory);
+  font-weight: 700;
+}
+
+.is-price-updating {
+  animation: pricing-number-change 320ms ease;
+}
+
+@keyframes pricing-number-change {
+  50% {
+    color: var(--color-gold-light);
+    opacity: 0.55;
+    transform: translateY(-1px);
+  }
+}
+
 .order-bar__review {
   min-height: 3rem;
   border-radius: var(--radius-pill);
@@ -3270,6 +3357,12 @@ button:focus-visible {
   border-top: 1px solid rgb(201 162 74 / 22%);
   padding-top: 0.55rem;
   font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-price-updating {
+    animation: none;
+  }
 }
 
 .cart-choice-dialog__options {

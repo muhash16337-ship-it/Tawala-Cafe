@@ -189,9 +189,9 @@
                         <p class="cart-choice-dialog__subtitle" id="cart-choice-subtitle">How would you like to send this dish?</p>
 
                         <div class="cart-choice-dialog__summary" aria-live="polite">
-                            <p>Current order <strong id="cart-choice-cart-summary"></strong></p>
-                            <p>This dish <strong id="cart-choice-dish-summary"></strong></p>
-                            <p class="cart-choice-dialog__combined">Combined total <strong id="cart-choice-combined-total"></strong></p>
+                            <p>Current order subtotal <strong id="cart-choice-cart-summary"></strong></p>
+                            <p>This dish subtotal <strong id="cart-choice-dish-summary"></strong></p>
+                            <p class="cart-choice-dialog__combined">Combined subtotal <strong id="cart-choice-combined-total"></strong></p>
                         </div>
 
                         <div class="cart-choice-dialog__options">
@@ -218,7 +218,6 @@
                         <div class="cart-choice-dialog__details-scroll">
                             <div class="cart-choice-dialog__compact-summary">
                                 <strong id="cart-choice-items-count"></strong>
-                                <span id="cart-choice-order-total"></span>
                                 <span class="cart-choice-dialog__summary-type" id="cart-choice-order-type-summary"></span>
                             </div>
                             <h2 class="cart-choice-dialog__title" id="cart-details-title">How would you like your order?</h2>
@@ -245,7 +244,17 @@
                                         <span class="cart-choice-dialog__type-check" aria-hidden="true">✓</span>
                                     </button>
                                 </div>
+                                <p class="cart-choice-dialog__packaging-note" data-packaging-note="type"></p>
                             </fieldset>
+
+                            <div class="cart-choice-dialog__pricing" aria-live="polite">
+                                <p>Subtotal <strong id="cart-choice-subtotal"></strong></p>
+                                <p class="cart-choice-dialog__packaging" id="cart-choice-packaging" hidden>
+                                    <span>Packaging (<span data-cart-packaging-count></span> × <span data-packaging-fee></span>)</span>
+                                    <strong id="cart-choice-packaging-amount"></strong>
+                                </p>
+                                <p class="cart-choice-dialog__total">Total <strong id="cart-choice-order-total"></strong></p>
+                            </div>
 
                             <fieldset class="payment-choice" aria-labelledby="cart-choice-payment-title">
                                 <legend id="cart-choice-payment-title">Payment</legend>
@@ -323,7 +332,11 @@
             </article>
         </dialog>
         <aside class="order-bar" id="order-bar" aria-label="Current order" hidden>
-            <p class="order-bar__summary"><strong id="order-bar-count">0 dishes</strong><span id="order-bar-total">KSh 0</span></p>
+            <p class="order-bar__summary">
+                <strong id="order-bar-count">0 dishes</strong>
+                <span class="order-bar__subtotal">Subtotal: <strong id="order-bar-total">KSh 0</strong></span>
+                <small class="order-bar__packaging-note" data-packaging-note="bar"></small>
+            </p>
             <button class="btn order-bar__review" id="order-review-open" type="button">Review order</button>
         </aside>
         <dialog class="dish-dialog order-dialog" id="order-dialog" aria-labelledby="order-dialog-title">
@@ -337,6 +350,11 @@
                 <div class="order-dialog__content">
                     <ul class="order-dialog__items" id="order-dialog-items"></ul>
                     <p class="order-dialog__empty" id="order-dialog-empty" role="status" hidden>Your order is empty. Pick a dish first.</p>
+                    <p class="dish-dialog__total order-dialog__subtotal">Subtotal <strong id="order-dialog-subtotal">KSh 0</strong></p>
+                    <p class="order-dialog__packaging" id="order-dialog-packaging" hidden>
+                        <span>Packaging (<span id="order-dialog-packaging-count"></span> × <span data-packaging-fee></span>)</span>
+                        <strong id="order-dialog-packaging-amount"></strong>
+                    </p>
                     <p class="dish-dialog__total order-dialog__total">Total <strong id="order-dialog-total">KSh 0</strong></p>
                     <p class="order-dialog__payment-hint">Pay with M-Pesa Till <strong data-payment-till-number></strong>.</p>
 
@@ -352,6 +370,7 @@
                             <button class="order-dialog__type-option" type="button" data-order-type-option="Pickup" aria-pressed="false">Pickup</button>
                             <button class="order-dialog__type-option" type="button" data-order-type-option="Delivery" aria-pressed="false">Delivery</button>
                         </div>
+                        <p class="order-dialog__packaging-note" data-packaging-note="type"></p>
                         <select id="order-type" aria-label="Choose order type" hidden>
                             <option value="Dine in">Dine in</option>
                             <option value="Pickup">Pickup</option>

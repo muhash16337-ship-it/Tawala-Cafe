@@ -1,5 +1,7 @@
 const PHONE_LOCAL = "0183750373";
 const PHONE_INTL = "254183750373";
+const PACKAGING_FEE_PER_DISH = 20;
+const TAKEAWAY_TYPES = ["Pickup", "Delivery"];
 
 const CONFIG = Object.freeze({
   tillNumber: "4366121",
@@ -220,9 +222,55 @@ function formatMenuPrice(price) {
   return `KSh ${new Intl.NumberFormat("en-KE").format(price)}`;
 }
 
+function calculateOrderTotals(items, orderType) {
+  const { subtotal, dishCount } = items.reduce((totals, item) => {
+    const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
+    const price = Number(item.price);
+    if (!Number.isFinite(price) || price < 0) {
+      throw new Error(`Invalid order price for ${String(item.name ?? "menu item")}.`);
+    }
+    return {
+      subtotal: totals.subtotal + price * quantity,
+      dishCount: totals.dishCount + quantity
+    };
+  }, { subtotal: 0, dishCount: 0 });
+  const packaging = TAKEAWAY_TYPES.includes(orderType) ? dishCount * PACKAGING_FEE_PER_DISH : 0;
+  return { subtotal, dishCount, packaging, total: subtotal + packaging };
+}
+
+function setAnimatedPrice(element, value) {
+  if (element.textContent === value) {
+    return;
+  }
+  element.textContent = value;
+  element.classList.remove("is-price-updating");
+  void element.offsetWidth;
+  element.classList.add("is-price-updating");
+  window.setTimeout(() => element.classList.remove("is-price-updating"), 350);
+}
+
+function renderPricingBreakdown(items, orderType, elements) {
+  const totals = calculateOrderTotals(items, orderType);
+  setAnimatedPrice(elements.subtotal, formatMenuPrice(totals.subtotal));
+  elements.packagingRow.hidden = totals.packaging === 0;
+  setAnimatedPrice(elements.packagingCount, String(totals.dishCount));
+  setAnimatedPrice(elements.packagingAmount, formatMenuPrice(totals.packaging));
+  setAnimatedPrice(elements.total, formatMenuPrice(totals.total));
+  return totals;
+}
+
 const formattedLocalPhone = PHONE_LOCAL.replace(/^(\d{4})(\d{3})(\d{3})$/, "$1 $2 $3");
 document.querySelectorAll("[data-phone-number]").forEach((element) => {
   element.textContent = formattedLocalPhone;
+});
+document.querySelectorAll("[data-packaging-fee]").forEach((element) => {
+  element.textContent = formatMenuPrice(PACKAGING_FEE_PER_DISH);
+});
+document.querySelectorAll('[data-packaging-note="type"]').forEach((element) => {
+  element.textContent = `Take away orders include ${formatMenuPrice(PACKAGING_FEE_PER_DISH)} packaging per dish.`;
+});
+document.querySelectorAll('[data-packaging-note="bar"]').forEach((element) => {
+  element.textContent = `+ ${formatMenuPrice(PACKAGING_FEE_PER_DISH)} packaging per dish for take away`;
 });
 document.querySelectorAll("[data-phone-link]").forEach((link) => {
   link.href = `tel:+${PHONE_INTL}`;
@@ -280,29 +328,27 @@ function buildOrderMessage(items, details = {}) {
   const name = String(details.name ?? "").trim();
   const instructions = String(details.specialInstructions ?? "").trim();
   const lines = [];
-  let total = 0;
+  const totals = calculateOrderTotals(items, orderType);
 
   const orderedItems = [];
   items.forEach((item) => {
     const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
-    const price = Number(item.price);
     const itemName = String(item.name ?? "").trim();
-    const option = String(item.option ?? "").trim();
-    if (!Number.isFinite(price) || price < 0) {
-      throw new Error(`Invalid order price for ${itemName || "menu item"}.`);
-    }
     if (!itemName) {
       throw new Error("An order item is missing its name.");
     }
 
-    const lineTotal = price * quantity;
-    total += lineTotal;
+    const option = String(item.option ?? "").trim();
     const displayName = option ? `${itemName} (${option})` : itemName;
     orderedItems.push(quantity > 1 ? `${displayName} (${quantity})` : displayName);
   });
 
   lines.push(`Hi Tawala Café, I wish to order ${orderedItems.join(", ")}.`);
-  lines.push(`Total: ${formatMenuPrice(total)}`);
+  lines.push(`Subtotal: ${formatMenuPrice(totals.subtotal)}`);
+  if (totals.packaging > 0) {
+    lines.push(`Packaging (${totals.dishCount} × ${formatMenuPrice(PACKAGING_FEE_PER_DISH)}): ${formatMenuPrice(totals.packaging)}`);
+  }
+  lines.push(`Total: ${formatMenuPrice(totals.total)}`);
 
   if (orderType) {
     const normalizedType = orderType.toLowerCase();
@@ -325,7 +371,7 @@ function buildOrderMessage(items, details = {}) {
   }
 
   if (details.paymentMethod === "mpesa") {
-    lines.push(`💳 Payment: M-Pesa Till ${CONFIG.tillNumber} (${formatMenuPrice(total)})`);
+    lines.push(`💳 Payment: M-Pesa Till ${CONFIG.tillNumber} (${formatMenuPrice(totals.total)})`);
     lines.push("I will send the M-Pesa confirmation message.");
   } else {
     const payment = !orderType
@@ -875,6 +921,9 @@ const cartChoiceSend = document.querySelector("#cart-choice-send");
 const cartChoiceValidation = document.querySelector("#cart-choice-validation");
 const cartChoiceItemsCount = document.querySelector("#cart-choice-items-count");
 const cartChoiceOrderTotal = document.querySelector("#cart-choice-order-total");
+const cartChoiceSubtotal = document.querySelector("#cart-choice-subtotal");
+const cartChoicePackaging = document.querySelector("#cart-choice-packaging");
+const cartChoicePackagingAmount = document.querySelector("#cart-choice-packaging-amount");
 const cartChoiceOrderTypeSummary = document.querySelector("#cart-choice-order-type-summary");
 const cartChoiceFallback = document.querySelector("#cart-choice-whatsapp-fallback");
 const cartChoiceFallbackLink = document.querySelector("#cart-choice-fallback-link");
@@ -897,6 +946,10 @@ const orderBarCount = document.querySelector("#order-bar-count");
 const orderBarTotal = document.querySelector("#order-bar-total");
 const orderDialogItems = document.querySelector("#order-dialog-items");
 const orderDialogEmpty = document.querySelector("#order-dialog-empty");
+const orderDialogSubtotal = document.querySelector("#order-dialog-subtotal");
+const orderDialogPackaging = document.querySelector("#order-dialog-packaging");
+const orderDialogPackagingCount = document.querySelector("#order-dialog-packaging-count");
+const orderDialogPackagingAmount = document.querySelector("#order-dialog-packaging-amount");
 const orderDialogTotal = document.querySelector("#order-dialog-total");
 const orderCustomerName = document.querySelector("#order-customer-name");
 const orderType = document.querySelector("#order-type");
@@ -997,14 +1050,18 @@ function getOrderLineDetails(line) {
 
 function renderOrder() {
   const lines = orderItems.map(getOrderLineDetails);
-  const total = lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
-  const quantity = lines.reduce((sum, line) => sum + line.quantity, 0);
+  const totals = renderPricingBreakdown(lines, orderType.value, {
+    subtotal: orderDialogSubtotal,
+    packagingRow: orderDialogPackaging,
+    packagingCount: orderDialogPackagingCount,
+    packagingAmount: orderDialogPackagingAmount,
+    total: orderDialogTotal
+  });
   orderBar.hidden = lines.length === 0;
-  orderBarCount.textContent = `${quantity} ${quantity === 1 ? "dish" : "dishes"}`;
-  orderBarTotal.textContent = formatMenuPrice(total);
-  orderDialogTotal.textContent = formatMenuPrice(total);
+  orderBarCount.textContent = `${totals.dishCount} ${totals.dishCount === 1 ? "dish" : "dishes"}`;
+  setAnimatedPrice(orderBarTotal, formatMenuPrice(totals.subtotal));
   orderDialog.querySelectorAll("[data-payment-order-total]").forEach((element) => {
-    element.textContent = formatMenuPrice(total);
+    setAnimatedPrice(element, formatMenuPrice(totals.total));
   });
   orderDialogEmpty.hidden = lines.length !== 0;
   orderSendWhatsApp.disabled = lines.length === 0;
@@ -1246,6 +1303,23 @@ function updateCartChoiceMethod(type) {
   cartChoiceValidation.hidden = true;
   cartChoiceLocation.classList.remove("is-invalid");
   cartChoiceSend.setAttribute("aria-disabled", String(type === "Delivery" && !cartChoiceLocation.value.trim()));
+  if (cartChoiceStepTwo.classList.contains("is-active") && cartChoiceOrderLines.length) {
+    renderCartChoicePricing();
+  }
+}
+
+function renderCartChoicePricing() {
+  const lines = cartChoiceOrderLines.map(getOrderLineDetails);
+  const totals = renderPricingBreakdown(lines, orderType.value, {
+    subtotal: cartChoiceSubtotal,
+    packagingRow: cartChoicePackaging,
+    packagingCount: cartChoicePackaging.querySelector("[data-cart-packaging-count]"),
+    packagingAmount: cartChoicePackagingAmount,
+    total: cartChoiceOrderTotal
+  });
+  cartChoiceStepTwo.querySelectorAll("[data-payment-order-total]").forEach((element) => {
+    setAnimatedPrice(element, formatMenuPrice(totals.total));
+  });
 }
 
 function showCartChoiceDetails(choice, orderLines) {
@@ -1258,12 +1332,8 @@ function showCartChoiceDetails(choice, orderLines) {
   });
   const resolvedLines = orderLines.map(getOrderLineDetails);
   const totalCount = resolvedLines.reduce((sum, line) => sum + line.quantity, 0);
-  const total = resolvedLines.reduce((sum, line) => sum + line.price * line.quantity, 0);
   cartChoiceItemsCount.textContent = `${totalCount} ${totalCount === 1 ? "item" : "items"}`;
-  cartChoiceOrderTotal.textContent = formatMenuPrice(total);
-  cartChoiceStepTwo.querySelectorAll("[data-payment-order-total]").forEach((element) => {
-    element.textContent = formatMenuPrice(total);
-  });
+  renderCartChoicePricing();
   cartChoiceSteps.classList.add("cart-choice-dialog__steps--details");
   cartChoiceStepOne.classList.remove("is-active");
   cartChoiceStepTwo.classList.add("is-active");
@@ -1371,7 +1441,7 @@ document.addEventListener("click", async (event) => {
 
 function updateDishDialogPrice() {
   dishDialogPrice.textContent = formatMenuPrice(activeDishPrice);
-  dishDialogTotal.textContent = formatMenuPrice(activeDishPrice * activeDishQuantity);
+  setAnimatedPrice(dishDialogTotal, formatMenuPrice(activeDishPrice * activeDishQuantity));
   dishDialogQuantity.textContent = String(activeDishQuantity);
   dishQuantityMinus.disabled = activeDishQuantity <= 1;
   dishQuantityPlus.disabled = activeDishQuantity >= 20;
@@ -1845,6 +1915,7 @@ orderDialogItems.addEventListener("click", (event) => {
 
 orderType.addEventListener("change", () => {
   syncOrderTypeToggle();
+  renderOrder();
   sessionStorage.setItem("tawala-order-type", orderType.value);
   if (orderType.value !== "Delivery") {
     orderLocationField.classList.remove("is-invalid");
