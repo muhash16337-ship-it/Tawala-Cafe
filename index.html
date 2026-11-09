@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script type="application/ld+json">
+    <script type="application/ld+json" id="restaurant-structured-data">
         {
             "@context": "https://schema.org",
             "@type": "Restaurant",
@@ -27,7 +27,6 @@
             "description": "Visit Tawala Café in Utawala, Nairobi for breakfast, shawarma, burgers, wings, fresh juices and coffee.",
             "image": "https://tawalacafe.co.ke/images/caffe.jpeg",
             "url": "https://tawalacafe.co.ke/",
-            "telephone": "+254703789777",
             "paymentAccepted": "Cash, M-Pesa",
             "address": {
                 "@type": "PostalAddress",
@@ -48,6 +47,9 @@
             <a class="logo" href="#home" aria-label="Tawala Café home">
                 <img src="images/logo.jpg" width="48" height="48" alt="">
                 <span>Tawala Café</span>
+            </a>
+            <a class="header__phone" href="#" data-phone-link aria-label="Call Tawala Café">
+                <span data-phone-number></span>
             </a>
             <button class="nav__toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="primary-navigation">
                 <span class="nav__toggle-line"></span>
@@ -336,6 +338,7 @@
                     <ul class="order-dialog__items" id="order-dialog-items"></ul>
                     <p class="order-dialog__empty" id="order-dialog-empty" role="status" hidden>Your order is empty. Pick a dish first.</p>
                     <p class="dish-dialog__total order-dialog__total">Total <strong id="order-dialog-total">KSh 0</strong></p>
+                    <p class="order-dialog__payment-hint">Pay with M-Pesa Till <strong data-payment-till-number></strong>.</p>
 
                     <label class="order-dialog__field">
                         <span class="order-dialog__label">Name (optional)</span>
@@ -431,6 +434,9 @@
                 <h2 class="section__heading" id="contact-heading">Let's make it a good meal.</h2>
                 <p class="contact__copy">Find us in Nairobi or get in touch to start your order. We can't wait to welcome you.</p>
                 <p class="contact__location" data-config-value="address" hidden></p>
+                <p class="contact__phone">
+                    Call us: <a href="#" data-phone-link><span data-phone-number></span></a>
+                </p>
                 <section class="payment-card" aria-labelledby="payment-card-title">
                     <div class="payment-card__heading">
                         <span class="payment-card__icon" aria-hidden="true">
@@ -449,18 +455,19 @@
                     <p class="payment-card__till-label">Till number</p>
                     <p class="payment-card__till-number" data-payment-till-number></p>
                     <div class="payment-card__copy-row">
-                        <button class="payment-choice__copy" type="button" data-copy-till-number>Copy Till number</button>
+                        <button class="payment-choice__copy payment-card__copy" type="button" data-copy-till-number>Copy Till number</button>
                         <span class="payment-choice__feedback" data-copy-feedback role="status" aria-live="polite" hidden></span>
                     </div>
                     <p class="payment-card__name-note" data-payment-till-name-note hidden></p>
                     <ol class="payment-card__steps">
                         <li>Open M-Pesa on your phone.</li>
-                        <li>Choose Lipa na M-Pesa, then Buy Goods and Services.</li>
+                        <li>Choose Lipa na M-Pesa.</li>
+                        <li>Select Buy Goods and Services.</li>
                         <li>Enter Till Number <strong data-payment-till-number></strong>.</li>
                         <li>Enter the amount from your order.</li>
                         <li>Enter your PIN and confirm.</li>
                     </ol>
-                    <p class="payment-card__cash-note">Cash is also accepted at the counter and on delivery.</p>
+                    <p class="payment-card__cash-note">Pay on delivery or at the counter.</p>
                     <p class="payment-card__footer-line">Pay via M-Pesa Till <span data-payment-till-number></span></p>
                 </section>
                 <section class="how-to-order" aria-labelledby="how-to-order-title">
@@ -472,6 +479,7 @@
                     </ol>
                 </section>
                 <a class="btn" href="#" data-whatsapp-link data-whatsapp-message="Hi Tawala Café, I'd like to place an order.">Start an order on WhatsApp</a>
+                <a class="btn btn--outline contact__call" href="#" data-phone-link>Call us</a>
             </div>
         </section>
     </main>
@@ -483,6 +491,7 @@
                     <span>Tawala Café</span>
                 </a>
                 <p>Good food, generous portions, and a warm welcome in Nairobi.</p>
+                <a class="footer__phone" href="#" data-phone-link><span data-phone-number></span></a>
             </div>
             <nav class="footer__links" aria-label="Footer">
                 <h2 class="footer__heading">Quick links</h2>
@@ -511,7 +520,11 @@
                     </a>
                     <a class="footer__directions" href="https://maps.google.com/maps?cid=507293632078050263" target="_blank" rel="noopener noreferrer">Get directions</a>
                 </div>
-                <p class="footer__payment">Pay via M-Pesa Till <span data-payment-till-number></span></p>
+                <div class="footer__payment">
+                    <span>M-Pesa Till: <strong data-payment-till-number></strong></span>
+                    <button class="footer__till-copy" type="button" data-copy-till-number>Copy Till number</button>
+                    <span class="payment-choice__feedback" data-copy-feedback role="status" aria-live="polite" hidden></span>
+                </div>
             </div>
         </div>
         <div class="footer__bottom">

@@ -1,5 +1,7 @@
+const PHONE_LOCAL = "0183750373";
+const PHONE_INTL = "254183750373";
+
 const CONFIG = Object.freeze({
-  whatsappNumber: "254703789777",
   tillNumber: "4366121",
   paymentMethod: "M-Pesa Buy Goods and Services (Lipa na M-Pesa)",
   tillName: "",
@@ -214,20 +216,22 @@ function isConfigured(value) {
   return typeof value === "string" && value.trim() !== "" && !/^\[.*\]$/.test(value.trim());
 }
 
-function cleanWhatsAppNumber(value) {
-  let digits = String(value ?? "").replace(/\D/g, "");
-  if (digits.startsWith("0")) {
-    digits = digits.slice(1);
-  }
-  if (digits.length === 9) {
-    digits = `254${digits}`;
-  }
-  return digits;
-}
-
 function formatMenuPrice(price) {
   return `KSh ${new Intl.NumberFormat("en-KE").format(price)}`;
 }
+
+const formattedLocalPhone = PHONE_LOCAL.replace(/^(\d{4})(\d{3})(\d{3})$/, "$1 $2 $3");
+document.querySelectorAll("[data-phone-number]").forEach((element) => {
+  element.textContent = formattedLocalPhone;
+});
+document.querySelectorAll("[data-phone-link]").forEach((link) => {
+  link.href = `tel:+${PHONE_INTL}`;
+});
+
+const restaurantStructuredData = document.querySelector("#restaurant-structured-data");
+const restaurantData = JSON.parse(restaurantStructuredData.textContent);
+restaurantData.telephone = `+${PHONE_INTL}`;
+restaurantStructuredData.textContent = JSON.stringify(restaurantData);
 
 function renderPaymentConfig() {
   document.querySelectorAll("[data-payment-till-number]").forEach((element) => {
@@ -331,11 +335,12 @@ function buildOrderMessage(items, details = {}) {
         : "at the counter";
     lines.push(`Payment: ${payment}`);
   }
+  lines.push(`Pay via M-Pesa Till ${CONFIG.tillNumber}`);
   return lines.join("\n");
 }
 
 function buildWhatsAppLink(orderItems, customerDetails = {}) {
-  const number = cleanWhatsAppNumber(CONFIG.whatsappNumber);
+  const number = PHONE_INTL;
   if (!number) {
     throw new Error("The WhatsApp number is missing or invalid.");
   }
@@ -353,8 +358,7 @@ function buildWhatsAppLink(orderItems, customerDetails = {}) {
 
 document.querySelectorAll("[data-whatsapp-link]").forEach((link) => {
   const message = link.dataset.whatsappMessage ?? "";
-  const number = cleanWhatsAppNumber(CONFIG.whatsappNumber);
-  link.href = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  link.href = `https://wa.me/${PHONE_INTL}?text=${encodeURIComponent(message)}`;
 });
 
 document.querySelectorAll("[data-config-value]").forEach((element) => {
@@ -1352,8 +1356,12 @@ document.addEventListener("click", async (event) => {
   feedback.hidden = true;
   try {
     await copyTextWithFallback(CONFIG.tillNumber);
-    feedback.textContent = "Copied";
+    feedback.textContent = "Copied ✓";
     feedback.hidden = false;
+    window.setTimeout(() => {
+      feedback.hidden = true;
+      feedback.textContent = "";
+    }, 1800);
   } catch (error) {
     feedback.textContent = "Copy failed. Please copy the Till number manually.";
     feedback.hidden = false;
