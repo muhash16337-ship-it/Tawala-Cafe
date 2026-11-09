@@ -7,27 +7,28 @@ const CONFIG = Object.freeze({
   tillNumber: "4366121",
   paymentMethod: "M-Pesa Buy Goods and Services (Lipa na M-Pesa)",
   tillName: "",
-  address: "[ADDRESS]",
-  mapEmbedUrl: "[MAP EMBED URL]",
+  address: "Utawala, Astrol, Eastern Bypass, Nairobi, Kenya",
+  mapEmbedUrl: "https://maps.google.com/maps?cid=507293632078050263&output=embed",
   instagram: "[HANDLE]",
   tiktok: "tawala.caffe",
   services: ["Dine in", "Pickup", "Delivery"],
-  payment: "At the counter or on delivery only",
+  payment: "Pay on delivery, at the counter, or by M-Pesa",
   timeZone: "Africa/Nairobi",
   deliveryFee: "[FEE or 'varies']",
   deliveryAreas: "[AREAS]",
   openingHours: {
-    Monday: "[HOURS]",
-    Tuesday: "[HOURS]",
-    Wednesday: "[HOURS]",
-    Thursday: "[HOURS]",
-    Friday: "[HOURS]",
-    Saturday: "[HOURS]",
-    Sunday: "[HOURS]"
+    Monday: "06:00-23:00",
+    Tuesday: "06:00-23:00",
+    Wednesday: "06:00-23:00",
+    Thursday: "06:00-23:00",
+    Friday: "06:00-23:00",
+    Saturday: "06:00-23:00",
+    Sunday: "06:00-23:00"
   }
 });
 
 const SHOW_DISH_PHOTOS = true;
+const ASSET_VERSION = "20261109";
 
 const SODA_FLAVOURS = [
   { brand: "Coca-Cola", items: ["Coca-Cola", "Sprite", "Fanta Orange", "Fanta Passion", "Fanta Blackcurrant"] },
@@ -171,19 +172,6 @@ const MENU_CATEGORY_ICONS = Object.freeze({
   "Soda & Water": ["M6 6h12l-1.5 15h-9L6 6Z", "M9 2l6 4", "M9 10h6"]
 });
 
-const KNOWN_MENU_IMAGES = Object.freeze({
-  shawarma: "images/shawarma.jpg",
-  "cheesy-loaded-fries": "images/loaded-fries.jpg",
-  "bbq-wings-6-pcs": "images/wings.jpg",
-  "beef-burger": "images/burger.jpg"
-});
-
-menuItems.forEach((item) => {
-  if (!item.image && KNOWN_MENU_IMAGES[item.id]) {
-    item.image = KNOWN_MENU_IMAGES[item.id];
-  }
-});
-
 function addIllustrativeImageLabel(container, item) {
   if (item.imageIllustrative !== true) {
     return;
@@ -195,6 +183,11 @@ function addIllustrativeImageLabel(container, item) {
   container.append(label);
 }
 
+function versionedAssetUrl(path) {
+  const separator = path.includes("?") ? "&" : "?";
+  return `${path}${separator}v=${ASSET_VERSION}`;
+}
+
 function createDishImage(item, { className, width, height, onError }) {
   const image = document.createElement("img");
   image.className = className;
@@ -204,7 +197,7 @@ function createDishImage(item, { className, width, height, onError }) {
   image.loading = "lazy";
   image.decoding = "async";
   image.addEventListener("error", () => onError(image), { once: true });
-  image.src = item.image;
+  image.src = versionedAssetUrl(item.image);
   return image;
 }
 
@@ -222,6 +215,38 @@ const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 function isConfigured(value) {
   return typeof value === "string" && value.trim() !== "" && !/^\[.*\]$/.test(value.trim());
 }
+
+function formatOpeningTime(value) {
+  const [hour, minute] = value.split(":").map(Number);
+  const period = hour >= 12 ? "PM" : "AM";
+  return `${hour % 12 || 12}:${String(minute).padStart(2, "0")} ${period}`;
+}
+
+function getOpeningHoursText() {
+  const hours = Object.values(CONFIG.openingHours);
+  if (hours.length && hours.every((value) => value === hours[0])) {
+    const [opens, closes] = hours[0].split("-");
+    return `Every day: ${formatOpeningTime(opens)}–${formatOpeningTime(closes)}`;
+  }
+  return Object.entries(CONFIG.openingHours)
+    .map(([day, value]) => {
+      const [opens, closes] = value.split("-");
+      return `${day}: ${formatOpeningTime(opens)}–${formatOpeningTime(closes)}`;
+    })
+    .join("; ");
+}
+
+function showOpeningHours() {
+  const hoursText = getOpeningHoursText();
+  document.querySelectorAll("[data-opening-hours]").forEach((element) => {
+    element.textContent = hoursText;
+  });
+  document.querySelectorAll("[data-footer-address]").forEach((element) => {
+    element.textContent = CONFIG.address;
+  });
+}
+
+showOpeningHours();
 
 function showGalleryImageFallback(image) {
   const placeholder = image.parentElement?.querySelector(".gallery__placeholder");
@@ -300,6 +325,15 @@ document.querySelectorAll("[data-phone-link]").forEach((link) => {
 const restaurantStructuredData = document.querySelector("#restaurant-structured-data");
 const restaurantData = JSON.parse(restaurantStructuredData.textContent);
 restaurantData.telephone = `+${PHONE_INTL}`;
+restaurantData.openingHoursSpecification = Object.entries(CONFIG.openingHours).map(([day, value]) => {
+  const [opens, closes] = value.split("-");
+  return {
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: `https://schema.org/${day}`,
+    opens,
+    closes
+  };
+});
 restaurantStructuredData.textContent = JSON.stringify(restaurantData);
 
 function renderPaymentConfig() {
@@ -613,6 +647,45 @@ const menuCategories = [
   "Juices & Mocktails",
   "Soda & Water"
 ];
+
+function renderMenuStructuredData() {
+  const menuSchema = {
+    "@context": "https://schema.org",
+    "@type": "Menu",
+    name: "Tawala Café Menu",
+    url: "https://tawalacafe.co.ke/#menu",
+    hasMenuSection: menuCategories.map((category) => ({
+      "@type": "MenuSection",
+      name: category,
+      hasMenuItem: menuItems
+        .filter((item) => item.category === category)
+        .map((item) => {
+          const menuItem = {
+            "@type": "MenuItem",
+            name: item.name,
+            offers: (item.options?.length ? item.options : [{ label: "", price: item.price }]).map((option) => ({
+              "@type": "Offer",
+              ...(option.label ? { name: option.label } : {}),
+              price: option.price,
+              priceCurrency: "KES"
+            }))
+          };
+          if (item.description) {
+            menuItem.description = item.description;
+          }
+          return menuItem;
+        })
+    }))
+  };
+  const script = document.createElement("script");
+  script.id = "menu-structured-data";
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify(menuSchema);
+  document.head.append(script);
+}
+
+renderMenuStructuredData();
+
 const selectedDishSides = new Map();
 const selectedDishSodas = new Map();
 
@@ -824,8 +897,8 @@ menuTabs.forEach((tab) => {
   label.textContent = tab.textContent;
   const thumbnail = document.createElement("img");
   thumbnail.className = "menu__tab-thumbnail";
-  thumbnail.src = photo.file.replace(/\.jpg$/i, "-thumb.webp");
-  thumbnail.alt = "";
+  thumbnail.src = versionedAssetUrl(photo.file.replace(/\.jpg$/i, "-thumb.webp"));
+  thumbnail.alt = photo.alt;
   thumbnail.width = 32;
   thumbnail.height = 32;
   thumbnail.loading = "lazy";
@@ -834,7 +907,7 @@ menuTabs.forEach((tab) => {
     thumbnail.onerror = () => {
       thumbnail.hidden = true;
     };
-    thumbnail.src = photo.file;
+    thumbnail.src = versionedAssetUrl(photo.file);
   };
   tab.replaceChildren(thumbnail, label);
 });
@@ -848,10 +921,10 @@ function createMenuCategoryPhoto(category, photo) {
   picture.className = "menu__category-picture";
   const source = document.createElement("source");
   source.type = "image/webp";
-  source.srcset = photo.file.replace(/\.jpg$/i, ".webp");
+  source.srcset = versionedAssetUrl(photo.file.replace(/\.jpg$/i, ".webp"));
 
   const image = document.createElement("img");
-  image.src = photo.file;
+  image.src = versionedAssetUrl(photo.file);
   image.alt = photo.alt;
   image.width = photo.width;
   image.height = photo.height;
@@ -942,7 +1015,7 @@ function createMenuItem(item, index) {
   const title = document.createElement("div");
   title.className = "menu__item-title";
 
-  const name = document.createElement("h4");
+  const name = document.createElement("h3");
   name.className = "menu__item-name";
   name.textContent = item.name;
   title.append(name);
@@ -1053,7 +1126,7 @@ function renderMenuItems(items) {
     categorySection.className = "menu__category";
     categorySection.setAttribute("aria-label", category);
 
-    const heading = document.createElement("h3");
+    const heading = document.createElement("h2");
     heading.className = "menu__category-heading";
     heading.textContent = category;
 
