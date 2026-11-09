@@ -29,6 +29,11 @@ const CONFIG = Object.freeze({
 
 const SHOW_DISH_PHOTOS = true;
 
+const SODA_FLAVOURS = [
+  { brand: "Coca-Cola", items: ["Coca-Cola", "Sprite", "Fanta Orange", "Fanta Passion", "Fanta Blackcurrant"] },
+  { brand: "Pepsi", items: ["Pepsi"] } // Add other stocked Pepsi flavours here, such as Mirinda, 7UP or Mountain Dew.
+];
+
 const menuItems = [
   { id: "mandazi", name: "Mandazi", description: "", category: "Breakfast & Pastry", price: 25, options: null, image: null, popular: false, available: true },
   { id: "samosa", name: "Samosa", description: "", category: "Breakfast & Pastry", price: 50, options: null, image: null, popular: false, available: true },
@@ -61,7 +66,7 @@ const menuItems = [
   { id: "shawarma", name: "Shawarma", description: "", category: "Lunch & Dinner", price: 200, options: [{ label: "Regular", price: 200 }, { label: "Large", price: 250 }], image: null, popular: true, available: true },
   { id: "shawarma-chips", name: "Shawarma Chips", description: "", category: "Lunch & Dinner", price: 300, options: null, image: null, popular: false, available: true },
   { id: "shawarma-bhajia", name: "Shawarma Bhajia", description: "", category: "Lunch & Dinner", price: 400, options: null, image: null, popular: false, available: true },
-  { id: "shawarma-combo", name: "Shawarma Combo", description: "Shawarma, chips and a soda", category: "Lunch & Dinner", price: 450, options: null, image: null, popular: false, available: true },
+  { id: "shawarma-combo", name: "Shawarma Combo", description: "Shawarma, chips and a soda", category: "Lunch & Dinner", price: 450, options: null, includesSoda: true, image: null, popular: false, available: true },
   { id: "fries", name: "Fries", description: "", category: "Lunch & Dinner", price: 100, options: [{ label: "Regular", price: 100 }, { label: "Large", price: 200 }], image: null, popular: false, available: true },
   { id: "cheesy-loaded-fries", name: "Cheesy Loaded Fries", description: "", category: "Lunch & Dinner", price: 400, options: [{ label: "Chicken", price: 400 }, { label: "Beef", price: 450 }], image: null, popular: true, available: true },
   { id: "masala-chips", name: "Masala Chips", description: "", category: "Lunch & Dinner", price: 200, options: null, image: null, popular: false, available: true },
@@ -69,7 +74,7 @@ const menuItems = [
   { id: "bbq-wings-6-pcs", name: "BBQ Wings (6 pcs)", description: "", category: "Lunch & Dinner", price: 400, options: null, image: null, popular: true, available: true },
   { id: "peri-peri-wings", name: "Peri Peri Wings", description: "", category: "Lunch & Dinner", price: 450, options: null, image: null, popular: false, available: true },
   { id: "wings-and-fries", name: "Wings & Fries", description: "", category: "Lunch & Dinner", price: 550, options: null, image: null, popular: false, available: true },
-  { id: "wings-combo", name: "Wings Combo", description: "Wings, chips and a soda", category: "Lunch & Dinner", price: 650, options: null, image: null, popular: false, available: true },
+  { id: "wings-combo", name: "Wings Combo", description: "Wings, chips and a soda", category: "Lunch & Dinner", price: 650, options: null, includesSoda: true, image: null, popular: false, available: true },
   { id: "12-pcs-wings", name: "12 pcs Wings", description: "", category: "Lunch & Dinner", price: 900, options: [{ label: "Wings only", price: 900 }, { label: "With chips", price: 1050 }], image: null, popular: false, available: true },
   { id: "juicy-chicken-burger", name: "Juicy Chicken Burger", description: "", category: "Lunch & Dinner", price: 400, options: null, image: null, popular: false, available: true },
   { id: "cheese-burger", name: "Cheese Burger", description: "", category: "Lunch & Dinner", price: 550, options: null, image: null, popular: false, available: true },
@@ -78,8 +83,8 @@ const menuItems = [
   { id: "grilled-chicken", name: "Grilled Chicken", description: "Served with chips, ugali or rice", category: "Lunch & Dinner", price: 550, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
   { id: "grilled-beef-steak", name: "Grilled Beef Steak", description: "Served with chips, ugali or rice", category: "Lunch & Dinner", price: 600, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
   { id: "beef-casserole", name: "Beef Casserole", description: "Served with chips, ugali or rice", category: "Lunch & Dinner", price: 400, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
-  { id: "shawarma-platter", name: "Shawarma Platter", description: "2 shawarmas, wings, fries and a soda", category: "Lunch & Dinner", price: 900, options: null, image: null, popular: false, available: true },
-  { id: "tawala-platter", name: "Tawala Platter", description: "Steak, chicken, shawarma, chips and a soda", category: "Lunch & Dinner", price: 2000, options: null, image: null, popular: false, available: true },
+  { id: "shawarma-platter", name: "Shawarma Platter", description: "2 shawarmas, wings, fries and a soda", category: "Lunch & Dinner", price: 900, options: null, includesSoda: true, image: null, popular: false, available: true },
+  { id: "tawala-platter", name: "Tawala Platter", description: "Steak, chicken, shawarma, chips and a soda", category: "Lunch & Dinner", price: 2000, options: null, includesSoda: true, image: null, popular: false, available: true },
   { id: "pilau", name: "Pilau", description: "", category: "Lunch & Dinner", price: 300, options: null, image: null, popular: false, available: true },
 
   { id: "fruit-platter", name: "Fruit Platter", description: "", category: "Desserts", price: 350, options: null, image: null, popular: false, available: true },
@@ -102,7 +107,7 @@ const menuItems = [
   { id: "passion-mojito", name: "Passion Mojito", description: "", category: "Juices & Mocktails", price: 300, options: null, image: null, popular: false, available: true },
   { id: "dawa-mocktail", name: "Dawa Mocktail", description: "", category: "Juices & Mocktails", price: 300, options: null, image: null, popular: false, available: true },
 
-  { id: "soda-350ml", name: "Soda", description: "", category: "Soda & Water", price: 70, options: [{ label: "350ml", price: 70 }, { label: "500ml", price: 100 }], image: null, popular: false, available: true },
+  { id: "soda-350ml", name: "Soda", description: "", category: "Soda & Water", price: 70, options: [{ label: "350ml", price: 70 }, { label: "500ml", price: 100 }], sodaChoice: true, image: null, popular: false, available: true },
   { id: "water", name: "Water", description: "", category: "Soda & Water", price: 70, options: [{ label: "500ml", price: 70 }, { label: "1L", price: 120 }], image: null, popular: false, available: true }
 ];
 
@@ -340,7 +345,15 @@ function buildOrderMessage(items, details = {}) {
 
     const option = String(item.option ?? "").trim();
     const side = String(item.side ?? "").trim();
-    const displayName = `${itemName}${option ? ` (${option})` : ""}${side ? ` (with ${side})` : ""}`;
+    const soda = String(item.soda ?? "").trim();
+    const displayName = formatWhatsAppOrderLineName({
+      name: itemName,
+      option,
+      side,
+      soda,
+      includesSoda: item.includesSoda,
+      sodaChoice: item.sodaChoice
+    });
     orderedItems.push(`${quantity} × ${displayName} – ${formatMenuPrice(Number(item.price) * quantity)}`);
   });
 
@@ -585,12 +598,40 @@ const menuCategories = [
   "Soda & Water"
 ];
 const selectedDishSides = new Map();
+const selectedDishSodas = new Map();
+
+function getMissingDishChoices(item) {
+  const missingChoices = [];
+  if (item.sides?.length && !item.sides.includes(selectedDishSides.get(item.id))) {
+    missingChoices.push("chips, ugali or rice");
+  }
+  if ((item.includesSoda || item.sodaChoice) && !getAllSodaFlavours().includes(selectedDishSodas.get(item.id))) {
+    missingChoices.push("your soda");
+  }
+  return missingChoices;
+}
+
+function updateDishChoiceFeedback(item, container) {
+  const missingChoices = getMissingDishChoices(item);
+  const sideGroup = container.querySelector(".menu__side-options");
+  const sodaGroup = container.querySelector(".menu__soda-options");
+  sideGroup?.classList.toggle("is-invalid", missingChoices.includes("chips, ugali or rice"));
+  sodaGroup?.classList.toggle("is-invalid", missingChoices.includes("your soda"));
+  const error = container.querySelector(".menu__choice-error") ?? (activeDish?.id === item.id ? dishDialogChoiceError : null);
+  if (error) {
+    error.textContent = missingChoices.length === 2
+      ? "Please choose chips, ugali or rice and choose your soda"
+      : missingChoices.length === 1
+        ? `Please choose ${missingChoices[0]}`
+        : "";
+    error.hidden = missingChoices.length === 0;
+  }
+}
 
 function syncDishSideSelection(item, side) {
   selectedDishSides.set(item.id, side);
   if (activeDish?.id === item.id) {
     activeDishSide = side;
-    dishDialogSideError.hidden = true;
   }
 
   menuResults.querySelectorAll(".menu__item").forEach((row) => {
@@ -600,17 +641,39 @@ function syncDishSideSelection(item, side) {
     row.querySelectorAll("[data-side-choice]").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.sideChoice === side));
     });
-    const error = row.querySelector(".menu__side-error");
-    if (error) {
-      error.hidden = true;
-    }
-    row.querySelector(".menu__side-options")?.classList.remove("is-invalid");
+    updateDishChoiceFeedback(item, row);
   });
 
   dishDialogSideOptions?.querySelectorAll("[data-side-choice]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button.dataset.sideChoice === side));
   });
-  dishDialogSideOptions?.classList.remove("is-invalid");
+  if (activeDish?.id === item.id) {
+    updateDishChoiceFeedback(item, dishDialogContent);
+  }
+}
+
+function syncDishSodaSelection(item, soda) {
+  selectedDishSodas.set(item.id, soda);
+  if (activeDish?.id === item.id) {
+    activeDishSoda = soda;
+  }
+
+  menuResults.querySelectorAll(".menu__item").forEach((row) => {
+    if (row.dataset.menuItem !== item.id) {
+      return;
+    }
+    row.querySelectorAll("[data-soda-choice]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.sodaChoice === soda));
+    });
+    updateDishChoiceFeedback(item, row);
+  });
+
+  dishDialogSodaOptions?.querySelectorAll("[data-soda-choice]").forEach((button) => {
+    button.setAttribute("aria-pressed", String(button.dataset.sodaChoice === soda));
+  });
+  if (activeDish?.id === item.id) {
+    updateDishChoiceFeedback(item, dishDialogContent);
+  }
 }
 
 function createSideChoiceGroup(item, { dialog = false } = {}) {
@@ -636,19 +699,79 @@ function createSideChoiceGroup(item, { dialog = false } = {}) {
   return group;
 }
 
-function requireDishSide(item, container, messageElement) {
-  const selectedSide = selectedDishSides.get(item.id);
-  if (!item.sides?.length || item.sides.includes(selectedSide)) {
+function getAllSodaFlavours() {
+  return SODA_FLAVOURS.flatMap((brand) => brand.items);
+}
+
+function createSodaChoiceGroup(item, { dialog = false } = {}) {
+  const group = document.createElement("div");
+  group.className = `menu__item-options menu__soda-options${dialog ? " dish-dialog__soda-options" : ""}`;
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", item.sodaChoice ? "Choose your soda flavour" : `Choose a soda for ${item.name}`);
+
+  if (item.includesSoda || item.sodaChoice) {
+    const title = document.createElement("span");
+    title.className = "menu__soda-label";
+    title.textContent = "Choose your soda";
+    group.append(title);
+  }
+
+  SODA_FLAVOURS.forEach(({ brand, items }) => {
+    const brandGroup = document.createElement("div");
+    brandGroup.className = "menu__soda-brand";
+    brandGroup.setAttribute("role", "group");
+    brandGroup.setAttribute("aria-label", brand);
+    const heading = document.createElement("span");
+    heading.className = "menu__soda-brand-name";
+    heading.textContent = brand;
+    brandGroup.append(heading);
+
+    items.forEach((soda) => {
+      const button = document.createElement("button");
+      button.className = "menu__item-option";
+      button.type = "button";
+      button.textContent = soda;
+      button.dataset.sodaChoice = soda;
+      button.setAttribute("aria-pressed", String(selectedDishSodas.get(item.id) === soda));
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        syncDishSodaSelection(item, soda);
+      });
+      brandGroup.append(button);
+    });
+
+    group.append(brandGroup);
+  });
+  return group;
+}
+
+function requireDishSelections(item, container, messageElement) {
+  const missingChoices = getMissingDishChoices(item);
+  if (missingChoices.length === 0) {
     return true;
   }
-  const group = container.querySelector(".menu__side-options");
-  group?.classList.remove("is-invalid");
-  if (group) {
-    void group.offsetWidth;
-    group.classList.add("is-invalid");
+
+  if (missingChoices.includes("chips, ugali or rice")) {
+    const group = container.querySelector(".menu__side-options");
+    group?.classList.remove("is-invalid");
+    if (group) {
+      void group.offsetWidth;
+      group.classList.add("is-invalid");
+    }
   }
+  if (missingChoices.includes("your soda")) {
+    const group = container.querySelector(".menu__soda-options");
+    group?.classList.remove("is-invalid");
+    if (group) {
+      void group.offsetWidth;
+      group.classList.add("is-invalid");
+    }
+  }
+
   if (messageElement) {
-    messageElement.textContent = "Please choose chips, ugali or rice";
+    messageElement.textContent = missingChoices.length === 2
+      ? "Please choose chips, ugali or rice and choose your soda"
+      : `Please choose ${missingChoices[0]}`;
     messageElement.hidden = false;
   }
   return false;
@@ -845,11 +968,18 @@ function createMenuItem(item, index) {
 
   if (item.sides?.length) {
     details.append(createSideChoiceGroup(item));
-    const sideError = document.createElement("p");
-    sideError.className = "menu__side-error";
-    sideError.setAttribute("role", "status");
-    sideError.hidden = true;
-    details.append(sideError);
+  }
+
+  if (item.includesSoda || item.sodaChoice) {
+    details.append(createSodaChoiceGroup(item));
+  }
+
+  if (item.sides?.length || item.includesSoda || item.sodaChoice) {
+    const choiceError = document.createElement("p");
+    choiceError.className = "menu__side-error menu__choice-error";
+    choiceError.setAttribute("role", "status");
+    choiceError.hidden = true;
+    details.append(choiceError);
   }
 
   if (item.description) {
@@ -970,8 +1100,10 @@ const dishDialogDescription = document.querySelector("#dish-dialog-description")
 const dishDialogOptions = document.querySelector("#dish-dialog-options");
 const dishDialogContent = document.querySelector(".dish-dialog__content");
 const dishDialogSideHost = document.querySelector("#dish-dialog-side-options");
-const dishDialogSideError = document.querySelector("#dish-dialog-side-error");
+const dishDialogSodaHost = document.querySelector("#dish-dialog-soda-options");
+const dishDialogChoiceError = document.querySelector("#dish-dialog-choice-error");
 let dishDialogSideOptions = null;
+let dishDialogSodaOptions = null;
 const dishDialogPrice = document.querySelector("#dish-dialog-price");
 const dishDialogUnavailable = document.querySelector("#dish-dialog-unavailable");
 const dishDialogQuantity = document.querySelector("#dish-quantity");
@@ -1019,6 +1151,7 @@ let cartChoiceDishOpener = null;
 let activeDish = null;
 let activeDishOption = null;
 let activeDishSide = "";
+let activeDishSoda = "";
 let activeDishPrice = 0;
 let activeDishQuantity = 1;
 let dishDialogOpener = null;
@@ -1090,12 +1223,17 @@ function loadCart() {
       const quantity = Number(storedLine?.quantity);
       const option = String(storedLine?.option ?? "");
       const side = String(storedLine?.side ?? "");
+      const soda = String(storedLine?.soda ?? "");
       const validOption = !option || item?.options?.some((itemOption) => itemOption.label === option);
       const validSide = item?.sides?.length
         ? item.sides.includes(side)
         : side === "";
-      return item && Number.isInteger(quantity) && quantity >= 1 && quantity <= 20 && validOption && validSide
-        ? [{ id: item.id, option, side, quantity }]
+      const needsSoda = Boolean(item?.includesSoda || item?.sodaChoice);
+      const validSoda = needsSoda
+        ? getAllSodaFlavours().includes(soda)
+        : soda === "";
+      return item && Number.isInteger(quantity) && quantity >= 1 && quantity <= 20 && validOption && validSide && validSoda
+        ? [{ id: item.id, option, side, soda, quantity }]
         : [];
     });
   } catch (error) {
@@ -1133,13 +1271,43 @@ function getOrderLineDetails(line) {
     name: item.name,
     option: option?.label ?? "",
     side: item.sides?.includes(line.side) ? line.side : "",
+    soda: (item.includesSoda || item.sodaChoice) && getAllSodaFlavours().includes(line.soda) ? line.soda : "",
+    includesSoda: Boolean(item.includesSoda),
+    sodaChoice: Boolean(item.sodaChoice),
     quantity: line.quantity,
     price: option?.price ?? item.price
   };
 }
 
 function formatOrderLineName(line) {
-  return `${line.name}${line.option ? ` (${line.option})` : ""}${line.side ? ` (with ${line.side})` : ""}`;
+  const choices = [];
+  if (line.soda) {
+    choices.push(line.soda);
+  }
+  if (line.option) {
+    choices.push(line.option);
+  }
+  if (line.side) {
+    choices.push(`with ${line.side}`);
+  }
+  return `${line.name}${choices.length ? ` (${choices.join(", ")})` : ""}`;
+}
+
+function formatWhatsAppOrderLineName(line) {
+  const choices = [];
+  if (line.soda && line.sodaChoice) {
+    choices.push(line.soda);
+  }
+  if (line.option) {
+    choices.push(line.option);
+  }
+  if (line.side) {
+    choices.push(`with ${line.side}`);
+  }
+  if (line.soda && !line.sodaChoice) {
+    choices.push(`Soda: ${line.soda}`);
+  }
+  return `${line.name}${choices.length ? ` (${choices.join(", ")})` : ""}`;
 }
 
 function renderOrder() {
@@ -1208,16 +1376,17 @@ function addActiveDishToOrder(closeDialog = true) {
   if (!activeDish || activeDish.available === false) {
     return;
   }
-  if (!requireDishSide(activeDish, dishDialogContent, dishDialogSideError)) {
+  if (!requireDishSelections(activeDish, dishDialogContent, dishDialogChoiceError)) {
     return;
   }
   const option = activeDishOption?.label ?? "";
   const side = activeDishSide;
-  const existingLine = orderItems.find((line) => line.id === activeDish.id && line.option === option && (line.side ?? "") === side);
+  const soda = activeDishSoda;
+  const existingLine = orderItems.find((line) => line.id === activeDish.id && line.option === option && (line.side ?? "") === side && (line.soda ?? "") === soda);
   if (existingLine) {
     existingLine.quantity = Math.min(20, existingLine.quantity + activeDishQuantity);
   } else {
-    orderItems.push({ id: activeDish.id, option, side, quantity: activeDishQuantity });
+    orderItems.push({ id: activeDish.id, option, side, soda, quantity: activeDishQuantity });
   }
   saveCart(orderItems);
   renderOrder();
@@ -1226,24 +1395,24 @@ function addActiveDishToOrder(closeDialog = true) {
   }
 }
 
-function addMenuItemToOrder(item, option, side, button) {
+function addMenuItemToOrder(item, option, side, soda, button) {
   if (!item || item.available === false) {
     return;
   }
 
   const optionLabel = option?.label ?? "";
-  const existingLine = orderItems.find((line) => line.id === item.id && line.option === optionLabel && (line.side ?? "") === side);
+  const existingLine = orderItems.find((line) => line.id === item.id && line.option === optionLabel && (line.side ?? "") === side && (line.soda ?? "") === soda);
   if (existingLine) {
     existingLine.quantity = Math.min(20, existingLine.quantity + 1);
   } else {
-    orderItems.push({ id: item.id, option: optionLabel, side, quantity: 1 });
+    orderItems.push({ id: item.id, option: optionLabel, side, soda, quantity: 1 });
   }
   saveCart(orderItems);
   renderOrder();
 
   button.disabled = true;
   button.classList.add("is-added");
-  button.setAttribute("aria-label", `${formatOrderLineName({ name: item.name, option: optionLabel, side })} added to order`);
+  button.setAttribute("aria-label", `${formatOrderLineName({ name: item.name, option: optionLabel, side, soda, includesSoda: item.includesSoda, sodaChoice: item.sodaChoice })} added to order`);
   window.setTimeout(() => {
     if (!button.isConnected) {
       return;
@@ -1251,11 +1420,12 @@ function addMenuItemToOrder(item, option, side, button) {
     button.classList.remove("is-added");
     button.disabled = false;
     const itemElement = button.closest("[data-order-item]");
-    const selectedOptionIndex = [...(itemElement?.querySelectorAll(".menu__item-options:not(.menu__side-options) .menu__item-option") ?? [])]
+    const selectedOptionIndex = [...(itemElement?.querySelectorAll(".menu__item-options:not(.menu__side-options):not(.menu__soda-options) .menu__item-option") ?? [])]
       .findIndex((optionButton) => optionButton.getAttribute("aria-pressed") === "true");
     const selectedOption = item.options?.[selectedOptionIndex] ?? item.options?.[0] ?? null;
     const selectedSide = selectedDishSides.get(item.id) ?? "";
-    button.setAttribute("aria-label", `Add ${formatOrderLineName({ name: item.name, option: selectedOption?.label ?? "", side: selectedSide })} to order`);
+    const selectedSoda = selectedDishSodas.get(item.id) ?? "";
+    button.setAttribute("aria-label", `Add ${formatOrderLineName({ name: item.name, option: selectedOption?.label ?? "", side: selectedSide, soda: selectedSoda, includesSoda: item.includesSoda, sodaChoice: item.sodaChoice })} to order`);
   }, 1000);
 }
 
@@ -1575,6 +1745,7 @@ function openDishDialog(item, opener) {
   activeDish = item;
   activeDishOption = item.options?.[0] ?? null;
   activeDishSide = selectedDishSides.get(item.id) ?? "";
+  activeDishSoda = selectedDishSodas.get(item.id) ?? "";
   activeDishPrice = activeDishOption?.price ?? item.price;
   activeDishQuantity = 1;
   dishDialogOpener = opener;
@@ -1587,14 +1758,21 @@ function openDishDialog(item, opener) {
   dishDialogTitle.textContent = item.name;
   dishDialogDescription.textContent = item.description;
   dishDialogDescription.hidden = !item.description;
-  dishDialogSideError.hidden = true;
-  dishDialogSideError.textContent = "";
+  dishDialogChoiceError.hidden = true;
+  dishDialogChoiceError.textContent = "";
   dishDialogSideHost.replaceChildren();
   dishDialogSideHost.hidden = !item.sides?.length;
+  dishDialogSodaHost.replaceChildren();
+  dishDialogSodaHost.hidden = !(item.includesSoda || item.sodaChoice);
   dishDialogSideOptions = null;
+  dishDialogSodaOptions = null;
   if (item.sides?.length) {
     dishDialogSideOptions = createSideChoiceGroup(item, { dialog: true });
     dishDialogSideHost.append(dishDialogSideOptions);
+  }
+  if (item.includesSoda || item.sodaChoice) {
+    dishDialogSodaOptions = createSodaChoiceGroup(item, { dialog: true });
+    dishDialogSodaHost.append(dishDialogSodaOptions);
   }
   renderDishDialogMedia(item);
   dishDialogOptions.replaceChildren();
@@ -1649,14 +1827,14 @@ menuResults.addEventListener("click", (event) => {
     return;
   }
 
-  if (!requireDishSide(item, itemElement, itemElement.querySelector(".menu__side-error"))) {
+  if (!requireDishSelections(item, itemElement, itemElement.querySelector(".menu__choice-error"))) {
     return;
   }
 
-  const selectedOptionIndex = [...itemElement.querySelectorAll(".menu__item-options:not(.menu__side-options) .menu__item-option")]
+  const selectedOptionIndex = [...itemElement.querySelectorAll(".menu__item-options:not(.menu__side-options):not(.menu__soda-options) .menu__item-option")]
     .findIndex((optionButton) => optionButton.getAttribute("aria-pressed") === "true");
   const selectedOption = item.options?.[selectedOptionIndex] ?? item.options?.[0] ?? null;
-  addMenuItemToOrder(item, selectedOption, selectedDishSides.get(item.id) ?? "", addButton);
+  addMenuItemToOrder(item, selectedOption, selectedDishSides.get(item.id) ?? "", selectedDishSodas.get(item.id) ?? "", addButton);
 });
 
 menuResults.addEventListener("click", (event) => {
@@ -1743,7 +1921,7 @@ dishDialogOrder.addEventListener("click", async () => {
   if (!activeDish || activeDish.available === false) {
     return;
   }
-  if (!requireDishSide(activeDish, dishDialogContent, dishDialogSideError)) {
+  if (!requireDishSelections(activeDish, dishDialogContent, dishDialogChoiceError)) {
     return;
   }
 
@@ -1751,13 +1929,14 @@ dishDialogOrder.addEventListener("click", async () => {
     id: activeDish.id,
     option: activeDishOption?.label ?? "",
     side: activeDishSide,
+    soda: activeDishSoda,
     quantity: activeDishQuantity
   }];
   if (orderItems.length > 0) {
     const currentCartLines = orderItems.map(getOrderLineDetails);
     const cartCount = currentCartLines.reduce((sum, line) => sum + line.quantity, 0);
     const cartTotal = currentCartLines.reduce((sum, line) => sum + line.price * line.quantity, 0);
-    const dishDisplayName = `${formatOrderLineName({ name: activeDish.name, option: activeDishOption?.label ?? "", side: activeDishSide })}${activeDishQuantity > 1 ? ` × ${activeDishQuantity}` : ""}`;
+    const dishDisplayName = `${formatOrderLineName({ name: activeDish.name, option: activeDishOption?.label ?? "", side: activeDishSide, soda: activeDishSoda, includesSoda: activeDish.includesSoda, sodaChoice: activeDish.sodaChoice })}${activeDishQuantity > 1 ? ` × ${activeDishQuantity}` : ""}`;
     await askCartChoice({
       dishName: dishDisplayName,
       dishPrice: activeDishPrice * activeDishQuantity,
@@ -1785,12 +1964,13 @@ cartChoiceDialog.addEventListener("click", (event) => {
         id: activeDish.id,
         option: activeDishOption?.label ?? "",
         side: activeDishSide,
+        soda: activeDishSoda,
         quantity: activeDishQuantity
       };
       let selectedLines;
       if (choiceButton.dataset.cartChoice === "add-all") {
         const combinedLines = orderItems.map((line) => ({ ...line }));
-        const existingLine = combinedLines.find((line) => line.id === activeLine.id && line.option === activeLine.option && (line.side ?? "") === activeLine.side);
+        const existingLine = combinedLines.find((line) => line.id === activeLine.id && line.option === activeLine.option && (line.side ?? "") === activeLine.side && (line.soda ?? "") === activeLine.soda);
         if (existingLine) {
           existingLine.quantity = Math.min(20, existingLine.quantity + activeLine.quantity);
         } else {

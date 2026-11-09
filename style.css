@@ -4663,37 +4663,68 @@ button:focus-visible {
   margin-top: 0.35rem;
 }
 
-.menu__side-options {
+.menu__side-options,
+.menu__soda-options {
   margin-top: 0.45rem;
 }
 
-.menu__side-options .menu__item-option {
+.menu__side-options .menu__item-option,
+.menu__soda-options .menu__item-option {
   min-width: 4.1rem;
   touch-action: manipulation;
   transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
 }
 
-.menu__side-options .menu__item-option[aria-pressed="true"] {
+.menu__side-options .menu__item-option[aria-pressed="true"],
+.menu__soda-options .menu__item-option[aria-pressed="true"] {
   animation: menu-side-selected 220ms ease-out;
 }
 
-.menu__side-options.is-invalid .menu__item-option {
+.menu__side-options.is-invalid .menu__item-option,
+.menu__soda-options.is-invalid .menu__item-option {
   border-color: #f0d98a;
   box-shadow: 0 0 0 1px rgb(212 175 55 / 30%);
 }
 
-.menu__side-options.is-invalid {
+.menu__side-options.is-invalid,
+.menu__soda-options.is-invalid {
   animation: menu-side-shake 360ms ease-in-out;
 }
 
-.menu__side-error,
+.menu__choice-error,
 .dish-dialog__side-error {
   margin: 0.35rem 0 0;
   color: #f0d98a;
   font-size: 0.78rem;
 }
 
-.dish-dialog__side-options-host {
+.menu__soda-options {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.menu__soda-label {
+  color: var(--section-text);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.menu__soda-brand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.menu__soda-brand-name {
+  width: 100%;
+  color: var(--section-accent-text);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.dish-dialog__side-options-host,
+.dish-dialog__soda-options-host {
   margin-top: 0.5rem;
 }
 
@@ -4868,7 +4899,9 @@ button:focus-visible {
   .menu__item-add-icon,
   .menu__item-add-feedback,
   .menu__side-options,
-  .menu__side-options .menu__item-option {
+  .menu__side-options .menu__item-option,
+  .menu__soda-options,
+  .menu__soda-options .menu__item-option {
     transition: none;
     animation: none;
   }
