@@ -31,8 +31,8 @@ const SHOW_DISH_PHOTOS = true;
 const ASSET_VERSION = "20261109";
 
 const SODA_FLAVOURS = [
-  { brand: "Coca-Cola", items: ["Coca-Cola", "Sprite", "Fanta Orange", "Fanta Passion", "Fanta Blackcurrant"] },
-  { brand: "Pepsi", items: ["Pepsi"] } // Add other stocked Pepsi flavours here, such as Mirinda, 7UP or Mountain Dew.
+  { brand: "Coca-Cola", items: ["Coke", "Fanta Orange", "Fanta Passion", "Black Currant", "Sprite"] },
+  { brand: "Pepsi", items: ["Pepsi"] }
 ];
 
 const menuItems = [
@@ -46,11 +46,17 @@ const menuItems = [
   { id: "coconut-scone", name: "Coconut Scone", description: "", category: "Breakfast & Pastry", price: 75, options: null, image: null, popular: false, available: true },
   { id: "plain-croissant", name: "Plain Croissant", description: "", category: "Breakfast & Pastry", price: 100, options: null, image: null, popular: false, available: true },
   { id: "hot-dog", name: "Hot Dog", description: "", category: "Breakfast & Pastry", price: 130, options: null, image: null, popular: false, available: true },
-  { id: "spanish-omelette-with-toast", name: "Spanish Omelette with Toast", description: "", category: "Breakfast & Pastry", price: 150, options: null, image: null, popular: false, available: true },
-  { id: "sausages", name: "Sausages", description: "", category: "Breakfast & Pastry", price: 100, options: null, image: null, popular: false, available: true },
-  { id: "breakfast-chapati-roll", name: "Breakfast Chapati Roll", description: "", category: "Breakfast & Pastry", price: 130, options: null, image: null, popular: false, available: true },
-  { id: "plain-omelette", name: "Plain Omelette", description: "", category: "Breakfast & Pastry", price: 100, options: null, image: null, popular: false, available: true },
-  { id: "tawala-breakfast", name: "Tawala Breakfast", description: "Spanish omelette, sausage and bacon with juice or tea", category: "Breakfast & Pastry", price: 500, options: null, image: null, popular: false, available: true },
+  { id: "chapati", name: "Chapati", description: "", category: "Breakfast & Pastry", price: 40, options: null, image: null, popular: false, available: true },
+  { id: "kaimati", name: "Kaimati", description: "", category: "Breakfast & Pastry", price: 30, options: null, image: null, popular: false, available: true },
+  { id: "mahamri", name: "Mahamri", description: "", category: "Breakfast & Pastry", price: 30, options: null, image: null, popular: false, available: true },
+
+  { id: "spanish-omelette-with-toast", name: "Spanish Omelette with Toast", description: "", category: "Breakfast Plates", price: 150, options: null, image: null, popular: false, available: true },
+  { id: "sausages", name: "Sausages", description: "", category: "Breakfast Plates", price: 100, options: null, image: null, popular: false, available: true },
+  { id: "breakfast-chapati-roll", name: "Breakfast Chapati Roll", description: "", category: "Breakfast Plates", price: 130, options: null, image: null, popular: false, available: true },
+  { id: "plain-omelette", name: "Plain Omelette", description: "", category: "Breakfast Plates", price: 100, options: null, image: null, popular: false, available: true },
+  { id: "chapati-mayai", name: "Chapati Mayai", description: "", category: "Breakfast Plates", price: 200, options: null, image: null, popular: false, available: true },
+  { id: "kima-chapati", name: "Kima Chapati", description: "", category: "Breakfast Plates", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "tawala-breakfast", name: "Tawala Breakfast", description: "Spanish omelette, sausage, bacon with juice or tea", category: "Breakfast Plates", price: 500, options: null, image: null, popular: false, available: true },
 
   { id: "african-tea", name: "African Tea", description: "", category: "Hot Drinks", price: 100, options: null, image: null, popular: false, available: true },
   { id: "black-tea", name: "Black Tea", description: "", category: "Hot Drinks", price: 80, options: null, image: null, popular: false, available: true },
@@ -64,51 +70,69 @@ const menuItems = [
   { id: "hot-chocolate", name: "Hot Chocolate", description: "", category: "Hot Drinks", price: 150, options: null, image: null, popular: false, available: true },
   { id: "hot-milk", name: "Hot Milk", description: "", category: "Hot Drinks", price: 100, options: null, image: null, popular: false, available: true },
 
-  { id: "shawarma", name: "Shawarma", description: "", category: "Lunch & Dinner", price: 200, options: [{ label: "Regular", price: 200 }, { label: "Large", price: 250 }], image: null, popular: true, available: true },
-  { id: "shawarma-chips", name: "Shawarma Chips", description: "", category: "Lunch & Dinner", price: 300, options: null, image: null, popular: false, available: true },
-  { id: "shawarma-bhajia", name: "Shawarma Bhajia", description: "", category: "Lunch & Dinner", price: 400, options: null, image: null, popular: false, available: true },
-  { id: "shawarma-combo", name: "Shawarma Combo", description: "Shawarma, chips and a soda", category: "Lunch & Dinner", price: 450, options: null, includesSoda: true, image: null, popular: false, available: true },
-  { id: "fries", name: "Fries", description: "", category: "Lunch & Dinner", price: 100, options: [{ label: "Regular", price: 100 }, { label: "Large", price: 200 }], image: null, popular: false, available: true },
-  { id: "cheesy-loaded-fries", name: "Cheesy Loaded Fries", description: "", category: "Lunch & Dinner", price: 400, options: [{ label: "Chicken", price: 400 }, { label: "Beef", price: 450 }], image: null, popular: true, available: true },
-  { id: "masala-chips", name: "Masala Chips", description: "", category: "Lunch & Dinner", price: 200, options: null, image: null, popular: false, available: true },
-  { id: "bhajia", name: "Bhajia", description: "", category: "Lunch & Dinner", price: 150, options: null, image: null, popular: false, available: true },
-  { id: "bbq-wings-6-pcs", name: "BBQ Wings (6 pcs)", description: "", category: "Lunch & Dinner", price: 400, options: null, image: null, popular: true, available: true },
-  { id: "peri-peri-wings", name: "Peri Peri Wings", description: "", category: "Lunch & Dinner", price: 450, options: null, image: null, popular: false, available: true },
-  { id: "wings-and-fries", name: "Wings & Fries", description: "", category: "Lunch & Dinner", price: 550, options: null, image: null, popular: false, available: true },
-  { id: "wings-combo", name: "Wings Combo", description: "Wings, chips and a soda", category: "Lunch & Dinner", price: 650, options: null, includesSoda: true, image: null, popular: false, available: true },
-  { id: "12-pcs-wings", name: "12 pcs Wings", description: "", category: "Lunch & Dinner", price: 900, options: [{ label: "Wings only", price: 900 }, { label: "With chips", price: 1050 }], image: null, popular: false, available: true },
-  { id: "juicy-chicken-burger", name: "Juicy Chicken Burger", description: "", category: "Lunch & Dinner", price: 400, options: null, image: null, popular: false, available: true },
-  { id: "cheese-burger", name: "Cheese Burger", description: "", category: "Lunch & Dinner", price: 550, options: null, image: null, popular: false, available: true },
-  { id: "beef-burger", name: "Beef Burger", description: "", category: "Lunch & Dinner", price: 500, options: null, image: null, popular: true, available: true },
-  { id: "veggie-burger", name: "Veggie Burger", description: "", category: "Lunch & Dinner", price: 400, options: null, image: null, popular: false, available: true },
-  { id: "grilled-chicken", name: "Grilled Chicken", description: "Served with chips, ugali or rice", category: "Lunch & Dinner", price: 550, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
-  { id: "grilled-beef-steak", name: "Grilled Beef Steak", description: "Served with chips, ugali or rice", category: "Lunch & Dinner", price: 600, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
-  { id: "beef-casserole", name: "Beef Casserole", description: "Served with chips, ugali or rice", category: "Lunch & Dinner", price: 400, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
-  { id: "shawarma-platter", name: "Shawarma Platter", description: "2 shawarmas, wings, fries and a soda", category: "Lunch & Dinner", price: 900, options: null, includesSoda: true, image: null, popular: false, available: true },
-  { id: "tawala-platter", name: "Tawala Platter", description: "Steak, chicken, shawarma, chips and a soda", category: "Lunch & Dinner", price: 2000, options: null, includesSoda: true, image: null, popular: false, available: true },
-  { id: "pilau", name: "Pilau", description: "", category: "Lunch & Dinner", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "shawarma-regular", name: "Shawarma Regular", description: "", category: "Shawarma & Fries", price: 200, options: null, image: null, popular: true, available: true },
+  { id: "shawarma-large", name: "Shawarma Large", description: "", category: "Shawarma & Fries", price: 250, options: null, image: null, popular: false, available: true },
+  { id: "shawarma-mix", name: "Shawarma Mix", description: "", category: "Shawarma & Fries", price: 350, options: null, image: null, popular: false, available: true },
+  { id: "shawarma-chips", name: "Shawarma Chips", description: "", category: "Shawarma & Fries", price: 320, options: null, image: null, popular: false, available: true },
+  { id: "shawarma-bhajia", name: "Shawarma Bhajia", description: "", category: "Shawarma & Fries", price: 400, options: null, image: null, popular: false, available: true },
+  { id: "shawarma-combo", name: "Shawarma Combo", description: "Shawarma, chips and soda", category: "Shawarma & Fries", price: 450, options: null, includesSoda: true, image: null, popular: false, available: true },
+  { id: "fries-regular", name: "Fries Regular", description: "", category: "Shawarma & Fries", price: 120, options: null, image: null, popular: false, available: true },
+  { id: "fries-large", name: "Fries Large", description: "", category: "Shawarma & Fries", price: 220, options: null, image: null, popular: false, available: true },
+  { id: "cheesy-loaded-fries-chicken", name: "Cheesy Loaded Fries Chicken", description: "", category: "Shawarma & Fries", price: 400, options: null, image: null, popular: true, available: true },
+  { id: "cheesy-loaded-fries-beef", name: "Cheesy Loaded Fries Beef", description: "", category: "Shawarma & Fries", price: 450, options: null, image: null, popular: false, available: true },
+
+  { id: "juicy-chicken-burger", name: "Juicy Chicken Burger", description: "", category: "Burgers", price: 400, options: null, image: null, popular: false, available: true },
+  { id: "cheese-burger", name: "Cheese Burger", description: "", category: "Burgers", price: 550, options: null, image: null, popular: false, available: true },
+  { id: "beef-burger", name: "Beef Burger", description: "", category: "Burgers", price: 500, options: null, image: null, popular: true, available: true },
+  { id: "veggie-burger", name: "Veggie Burger", description: "", category: "Burgers", price: 400, options: null, image: null, popular: false, available: true },
+
+  { id: "dry-fish", name: "Dry Fish", description: "Served with fries", category: "Fish", price: 600, options: null, image: null, popular: false, available: true },
+  { id: "wet-fish", name: "Wet Fish", description: "", category: "Fish", price: 600, options: null, sides: ["Ugali", "Fries"], image: null, popular: false, available: true },
+
+  { id: "masala-chips", name: "Masala Chips", description: "", category: "Wings & Chips", price: 200, options: null, image: null, popular: false, available: true },
+  { id: "bhajia", name: "Bhajia", description: "", category: "Wings & Chips", price: 150, options: null, image: null, popular: false, available: true },
+  { id: "bbq-wings-6-pcs", name: "BBQ Wings (6 pcs)", description: "", category: "Wings & Chips", price: 400, options: null, image: null, popular: true, available: true },
+  { id: "peri-peri-wings", name: "Peri Peri Wings", description: "", category: "Wings & Chips", price: 450, options: null, image: null, popular: false, available: true },
+  { id: "wings-and-fries", name: "Wings & Fries", description: "", category: "Wings & Chips", price: 550, options: null, image: null, popular: false, available: true },
+  { id: "wings-combo", name: "Wings Combo", description: "Wings, chips and soda", category: "Wings & Chips", price: 650, options: null, includesSoda: true, image: null, popular: false, available: true },
+  { id: "12-pcs-wings", name: "12 pcs Wings", description: "", category: "Wings & Chips", price: 900, options: [{ label: "Wings only", price: 900 }, { label: "With chips", price: 1050 }], image: null, popular: false, available: true },
+
+  { id: "quarter-chicken", name: "1/4 Chicken", description: "", category: "Grills & Curry", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "grilled-chicken", name: "Grilled Chicken", description: "", category: "Grills & Curry", price: 400, options: null, sides: ["Ugali", "Fries", "Rice"], sidePrices: { Ugali: 400, Fries: 420, Rice: 500 }, image: null, popular: false, available: true },
+  { id: "grilled-beef-steak", name: "Grilled Beef Steak", description: "", category: "Grills & Curry", price: 600, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
+  { id: "beef-casserole", name: "Beef Casserole", description: "", category: "Grills & Curry", price: 400, options: null, sides: ["Chips", "Ugali", "Rice"], image: null, popular: false, available: true },
+  { id: "chicken-curry", name: "Chicken Curry", description: "Served with white rice", category: "Grills & Curry", price: 450, options: null, image: null, popular: false, available: true },
+  { id: "biryani", name: "Biryani", description: "", category: "Grills & Curry", price: 350, options: null, image: null, popular: false, available: true },
+  { id: "chicken-biryani", name: "Chicken Biryani", description: "", category: "Grills & Curry", price: 550, options: null, image: null, popular: false, available: true },
+  { id: "pilau", name: "Pilau", description: "", category: "Grills & Curry", price: 300, options: null, image: null, popular: false, available: true },
+
+  { id: "shawarma-platter", name: "Shawarma Platter", description: "2 shawarmas, wings, fries, soda", category: "Platters", price: 900, options: null, includesSoda: true, image: null, popular: false, available: true },
+  { id: "classic-platter", name: "Classic Platter", description: "Shawarma, BBQ wings, pilau, fries, grilled chicken, chapati, 1L soda", category: "Platters", price: 1600, options: null, includesSoda: true, image: null, popular: false, available: true },
+  { id: "tawala-platter", name: "Tawala Platter", description: "Beef steak, 1/2 grilled chicken, 2 regular shawarmas, 2 regular fries, chicken biryani, 2 chapatis, 1L soda", category: "Platters", price: 2500, options: null, includesSoda: true, image: null, popular: false, available: true },
 
   { id: "fruit-platter", name: "Fruit Platter", description: "", category: "Desserts", price: 350, options: null, image: null, popular: false, available: true },
   { id: "ice-cream-scoop", name: "Ice Cream Scoop", description: "", category: "Desserts", price: 300, options: null, image: null, popular: false, available: true },
   { id: "cakes-on-display", name: "Cakes on Display", description: "Ask which cakes are in today", category: "Desserts", price: 300, options: null, image: null, popular: false, available: true },
 
-  { id: "fresh-mango-juice", name: "Fresh Mango Juice", description: "", category: "Juices & Mocktails", price: 180, options: null, image: null, popular: false, available: true },
-  { id: "fresh-passion-juice", name: "Fresh Passion Juice", description: "", category: "Juices & Mocktails", price: 180, options: null, image: null, popular: false, available: true },
-  { id: "fresh-pineapple-juice", name: "Fresh Pineapple Juice", description: "", category: "Juices & Mocktails", price: 180, options: null, image: null, popular: false, available: true },
-  { id: "fresh-cocktail-juice", name: "Fresh Cocktail Juice", description: "", category: "Juices & Mocktails", price: 180, options: null, image: null, popular: false, available: true },
-  { id: "apple-ginger-juice", name: "Apple Ginger Juice", description: "", category: "Juices & Mocktails", price: 200, options: null, image: null, popular: false, available: true },
-  { id: "strawberry-milkshake", name: "Strawberry Milkshake", description: "", category: "Juices & Mocktails", price: 300, options: null, image: null, popular: false, available: true },
-  { id: "chocolate-milkshake", name: "Chocolate Milkshake", description: "", category: "Juices & Mocktails", price: 300, options: null, image: null, popular: false, available: true },
-  { id: "vanilla-milkshake", name: "Vanilla Milkshake", description: "", category: "Juices & Mocktails", price: 300, options: null, image: null, popular: false, available: true },
-  { id: "mango-mint-milkshake", name: "Mango Mint Milkshake", description: "", category: "Juices & Mocktails", price: 350, options: null, image: null, popular: false, available: true },
-  { id: "salted-caramel-milkshake", name: "Salted Caramel Milkshake", description: "", category: "Juices & Mocktails", price: 350, options: null, image: null, popular: false, available: true },
-  { id: "strawberry-mojito", name: "Strawberry Mojito", description: "", category: "Juices & Mocktails", price: 250, options: null, image: null, popular: false, available: true },
-  { id: "ginger-lemonade", name: "Ginger Lemonade", description: "", category: "Juices & Mocktails", price: 250, options: null, image: null, popular: false, available: true },
-  { id: "mint-lemonade", name: "Mint Lemonade", description: "", category: "Juices & Mocktails", price: 250, options: null, image: null, popular: false, available: true },
-  { id: "passion-mojito", name: "Passion Mojito", description: "", category: "Juices & Mocktails", price: 300, options: null, image: null, popular: false, available: true },
-  { id: "dawa-mocktail", name: "Dawa Mocktail", description: "", category: "Juices & Mocktails", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "mango-juice", name: "Mango", description: "", category: "Fresh Juices", price: 180, options: null, image: null, popular: false, available: true },
+  { id: "passion-juice", name: "Passion", description: "", category: "Fresh Juices", price: 180, options: null, image: null, popular: false, available: true },
+  { id: "pineapple-juice", name: "Pineapple", description: "", category: "Fresh Juices", price: 180, options: null, image: null, popular: false, available: true },
+  { id: "cocktail-juice", name: "Cocktail", description: "", category: "Fresh Juices", price: 180, options: null, image: null, popular: false, available: true },
+  { id: "apple-ginger-juice", name: "Apple Ginger", description: "", category: "Fresh Juices", price: 200, options: null, image: null, popular: false, available: true },
 
-  { id: "soda-350ml", name: "Soda", description: "", category: "Soda & Water", price: 70, options: [{ label: "350ml", price: 70 }, { label: "500ml", price: 100 }], sodaChoice: true, image: null, popular: false, available: true },
+  { id: "strawberry-milkshake", name: "Strawberry", description: "", category: "Milkshakes", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "chocolate-milkshake", name: "Chocolate", description: "", category: "Milkshakes", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "vanilla-milkshake", name: "Vanilla", description: "", category: "Milkshakes", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "mango-mint-milkshake", name: "Mango Mint", description: "", category: "Milkshakes", price: 350, options: null, image: null, popular: false, available: true },
+  { id: "salted-caramel-milkshake", name: "Salted Caramel", description: "", category: "Milkshakes", price: 350, options: null, image: null, popular: false, available: true },
+
+  { id: "strawberry-mojito", name: "Strawberry Mojito", description: "", category: "Mocktails", price: 250, options: null, image: null, popular: false, available: true },
+  { id: "ginger-lemonade", name: "Ginger Lemonade", description: "", category: "Mocktails", price: 250, options: null, image: null, popular: false, available: true },
+  { id: "mint-lemonade", name: "Mint Lemonade", description: "", category: "Mocktails", price: 250, options: null, image: null, popular: false, available: true },
+  { id: "passion-mojito", name: "Passion Mojito", description: "", category: "Mocktails", price: 300, options: null, image: null, popular: false, available: true },
+  { id: "dawa-mocktail", name: "Dawa", description: "", category: "Mocktails", price: 300, options: null, image: null, popular: false, available: true },
+
+  { id: "soda", name: "Soda", description: "", category: "Soda & Water", price: 70, options: [{ label: "350ml", price: 70 }, { label: "500ml", price: 100 }, { label: "1L", price: 200 }], sodaChoice: true, image: null, popular: false, available: true },
   { id: "water", name: "Water", description: "", category: "Soda & Water", price: 70, options: [{ label: "500ml", price: 70 }, { label: "1L", price: 120 }], image: null, popular: false, available: true }
 ];
 
@@ -121,6 +145,14 @@ const MENU_CATEGORY_PHOTOS = Object.freeze({
     height: 981,
     subtitle: "A generous start to the day."
   },
+  "Breakfast Plates": {
+    file: "images/menu/breakfast.jpg",
+    alt: "Breakfast plate at Tawala Café",
+    focus: "50% 40%",
+    width: 736,
+    height: 981,
+    subtitle: "Classic plates to start your day."
+  },
   "Hot Drinks": {
     file: "images/menu/drinks.jpg",
     alt: "Cappuccino with latte art at Tawala Café",
@@ -129,13 +161,53 @@ const MENU_CATEGORY_PHOTOS = Object.freeze({
     height: 1104,
     subtitle: "Coffee, tea and something warm."
   },
-  "Lunch & Dinner": {
+  "Shawarma & Fries": {
     file: "images/menu/lunch.jpg",
     alt: "Shawarma wrap at Tawala Café",
     focus: "50% 42%",
     width: 673,
     height: 1200,
-    subtitle: "From the grill, made to share."
+    subtitle: "Golden fries and freshly made shawarma."
+  },
+  Burgers: {
+    file: "images/menu/lunch.jpg",
+    alt: "Burger meal at Tawala Café",
+    focus: "50% 42%",
+    width: 673,
+    height: 1200,
+    subtitle: "Freshly made favourites from the grill."
+  },
+  Fish: {
+    file: "images/menu/lunch.jpg",
+    alt: "Fish meal at Tawala Café",
+    focus: "50% 42%",
+    width: 673,
+    height: 1200,
+    subtitle: "Fish dishes served with your choice of side."
+  },
+  "Wings & Chips": {
+    file: "images/menu/lunch.jpg",
+    alt: "Wings and chips at Tawala Café",
+    focus: "50% 42%",
+    width: 673,
+    height: 1200,
+    subtitle: "Wings, chips and shareable favourites."
+  },
+  "Grills & Curry": {
+    file: "images/menu/lunch.jpg",
+    alt: "Grilled meal at Tawala Café",
+    focus: "50% 42%",
+    width: 673,
+    height: 1200,
+    subtitle: "From the grill and kitchen, made to order."
+  },
+  Platters: {
+    file: "images/menu/lunch.jpg",
+    alt: "Sharing platter at Tawala Café",
+    focus: "50% 42%",
+    width: 673,
+    height: 1200,
+    subtitle: "Generous platters made for sharing."
   },
   Desserts: {
     file: "images/menu/desserts.jpg",
@@ -145,13 +217,29 @@ const MENU_CATEGORY_PHOTOS = Object.freeze({
     height: 1308,
     subtitle: "A sweet finish to your meal."
   },
-  "Juices & Mocktails": {
+  "Fresh Juices": {
     file: "images/menu/juice.jpg",
     alt: "Fresh orange juice at Tawala Café",
     focus: "50% 42%",
     width: 810,
     height: 1440,
     subtitle: "Fresh, fruity and made to refresh."
+  },
+  Milkshakes: {
+    file: "images/menu/juice.jpg",
+    alt: "Milkshake at Tawala Café",
+    focus: "50% 42%",
+    width: 810,
+    height: 1440,
+    subtitle: "Creamy milkshakes in classic flavours."
+  },
+  Mocktails: {
+    file: "images/menu/juice.jpg",
+    alt: "Refreshing mocktail at Tawala Café",
+    focus: "50% 42%",
+    width: 810,
+    height: 1440,
+    subtitle: "Cool, refreshing drinks with a twist."
   },
   "Soda & Water": {
     file: "images/menu/soda.jpg",
@@ -165,10 +253,18 @@ const MENU_CATEGORY_PHOTOS = Object.freeze({
 
 const MENU_CATEGORY_ICONS = Object.freeze({
   "Breakfast & Pastry": ["M3 12h18", "M5 12a7 7 0 0 1 14 0", "M5 16h14"],
+  "Breakfast Plates": ["M3 12h18", "M5 12a7 7 0 0 1 14 0", "M5 16h14"],
   "Hot Drinks": ["M5 7h12v9a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7Z", "M17 10h2a2 2 0 0 1 0 4h-2", "M8 4v1", "M12 4v1"],
-  "Lunch & Dinner": ["M6 3v7", "M3.5 3v4a2.5 2.5 0 0 0 5 0V3", "M6 10v11", "M16 3v18", "M16 3c3 2 3 6 0 8"],
+  "Shawarma & Fries": ["M6 3v7", "M3.5 3v4a2.5 2.5 0 0 0 5 0V3", "M6 10v11"],
+  Burgers: ["M3 12h18", "M5 12a7 7 0 0 1 14 0", "M5 16h14"],
+  Fish: ["M3 12c4-5 10-7 18 0-8 7-14 5-18 0Z", "M16 12h.01"],
+  "Wings & Chips": ["M6 3v7", "M3.5 3v4a2.5 2.5 0 0 0 5 0V3", "M6 10v11"],
+  "Grills & Curry": ["M6 3v7", "M3.5 3v4a2.5 2.5 0 0 0 5 0V3", "M6 10v11", "M16 3v18"],
+  Platters: ["M3 12h18", "M5 12a7 7 0 0 1 14 0", "M5 16h14"],
   Desserts: ["M4 11h16l-2 9H6l-2-9Z", "M6 11a6 6 0 0 1 12 0", "M12 3v2"],
-  "Juices & Mocktails": ["M5 5h14l-2 16H7L5 5Z", "M9 9h6", "M12 5V2"],
+  "Fresh Juices": ["M5 5h14l-2 16H7L5 5Z", "M9 9h6", "M12 5V2"],
+  Milkshakes: ["M5 5h14l-2 16H7L5 5Z", "M9 9h6", "M12 5V2"],
+  Mocktails: ["M5 5h14l-2 16H7L5 5Z", "M9 9h6", "M12 5V2"],
   "Soda & Water": ["M6 6h12l-1.5 15h-9L6 6Z", "M9 2l6 4", "M9 10h6"]
 });
 
@@ -641,10 +737,18 @@ const menuResults = document.querySelector("#menu-results");
 let selectedMenuCategory = "All";
 const menuCategories = [
   "Breakfast & Pastry",
+  "Breakfast Plates",
   "Hot Drinks",
-  "Lunch & Dinner",
+  "Shawarma & Fries",
+  "Burgers",
+  "Fish",
+  "Wings & Chips",
+  "Grills & Curry",
+  "Platters",
   "Desserts",
-  "Juices & Mocktails",
+  "Fresh Juices",
+  "Milkshakes",
+  "Mocktails",
   "Soda & Water"
 ];
 
@@ -660,10 +764,15 @@ function renderMenuStructuredData() {
       hasMenuItem: menuItems
         .filter((item) => item.category === category)
         .map((item) => {
+          const itemOptions = item.options?.length
+            ? item.options
+            : item.sidePrices
+              ? Object.entries(item.sidePrices).map(([label, price]) => ({ label, price }))
+              : [{ label: "", price: item.price }];
           const menuItem = {
             "@type": "MenuItem",
             name: item.name,
-            offers: (item.options?.length ? item.options : [{ label: "", price: item.price }]).map((option) => ({
+            offers: itemOptions.map((option) => ({
               "@type": "Offer",
               ...(option.label ? { name: option.label } : {}),
               price: option.price,
@@ -721,7 +830,7 @@ function updateDishChoiceFeedback(item, container) {
 }
 
 function syncDishDialogChoiceState(item, missingChoices = getMissingDishChoices(item)) {
-  const hasChoices = Boolean(item.sides?.length || item.includesSoda || item.sodaChoice);
+  const hasChoices = Boolean(item.options?.length || item.sides?.length || item.includesSoda || item.sodaChoice);
   dishDialogAdd.disabled = item.available === false || missingChoices.length > 0;
   dishDialogAdd.textContent = hasChoices ? "Add to order" : "Add another dish";
   dishDialogChoiceHelper.hidden = !hasChoices || missingChoices.length === 0;
@@ -738,6 +847,8 @@ function syncDishSideSelection(item, side) {
   selectedDishSides.set(item.id, side);
   if (activeDish?.id === item.id) {
     activeDishSide = side;
+    activeDishPrice = item.sidePrices?.[side] ?? activeDishOption?.price ?? item.price;
+    updateDishDialogPrice();
   }
 
   menuResults.querySelectorAll(".menu__item").forEach((row) => {
@@ -797,7 +908,8 @@ function createSideChoiceGroup(item, { dialog = false } = {}) {
     const button = document.createElement("button");
     button.className = "menu__item-option";
     button.type = "button";
-    button.textContent = side;
+    const sidePrice = item.sidePrices?.[side];
+    button.textContent = sidePrice === undefined ? side : `${side} — ${formatMenuPrice(sidePrice)}`;
     button.dataset.sideChoice = side;
     button.setAttribute("aria-pressed", String(selectedDishSides.get(item.id) === side));
     button.addEventListener("click", (event) => {
@@ -977,7 +1089,7 @@ function createMenuCategoryIcon(category) {
 function createMenuItem(item, index) {
   const listItem = document.createElement("li");
   listItem.className = "menu__item";
-  if (item.options?.length && !item.sodaChoice) {
+  if (item.options?.length || item.description) {
     listItem.classList.add("menu__item--has-options");
   }
   listItem.dataset.menuItem = item.id;
@@ -1053,30 +1165,6 @@ function createMenuItem(item, index) {
   pricePill.append(optionPrice);
   titleRow.append(title, leader, pricePill);
   details.append(titleRow);
-
-  if (item.options?.length && !item.sodaChoice) {
-    const options = document.createElement("div");
-    options.className = "menu__item-options";
-    options.setAttribute("role", "group");
-    options.setAttribute("aria-label", `${item.name} options`);
-
-    item.options.forEach((option, index) => {
-      const optionButton = document.createElement("button");
-      optionButton.className = "menu__item-option";
-      optionButton.type = "button";
-      optionButton.textContent = option.label;
-      optionButton.setAttribute("aria-pressed", String(index === 0));
-      optionButton.addEventListener("click", () => {
-        options.querySelectorAll(".menu__item-option").forEach((button) => {
-          button.setAttribute("aria-pressed", String(button === optionButton));
-        });
-        optionPrice.textContent = `KSh ${new Intl.NumberFormat("en-KE").format(option.price)}`;
-      });
-      options.append(optionButton);
-    });
-
-    details.append(options);
-  }
 
   if (item.description) {
     const description = document.createElement("p");
@@ -1372,7 +1460,7 @@ function getOrderLineDetails(line) {
     includesSoda: Boolean(item.includesSoda),
     sodaChoice: Boolean(item.sodaChoice),
     quantity: line.quantity,
-    price: option?.price ?? item.price
+    price: item.sidePrices?.[line.side] ?? option?.price ?? item.price
   };
 }
 
@@ -1385,12 +1473,16 @@ function formatOrderLineName(line) {
     choices.push(line.option);
   }
   if (line.side) {
-    choices.push(`with ${line.side}`);
+    choices.push(line.side);
   }
   return `${line.name}${choices.length ? ` (${choices.join(", ")})` : ""}`;
 }
 
 function formatWhatsAppOrderLineName(line) {
+  if (line.sodaChoice && line.option) {
+    return `${line.name} ${line.option}, ${line.soda}`;
+  }
+
   const choices = [];
   if (line.soda && line.sodaChoice) {
     choices.push(line.soda);
@@ -1399,7 +1491,7 @@ function formatWhatsAppOrderLineName(line) {
     choices.push(line.option);
   }
   if (line.side) {
-    choices.push(`with ${line.side}`);
+    choices.push(line.side);
   }
   if (line.soda && !line.sodaChoice) {
     choices.push(`Soda: ${line.soda}`);
@@ -1931,15 +2023,12 @@ menuResults.addEventListener("click", (event) => {
     return;
   }
 
-  if (item.sides?.length || item.includesSoda || item.sodaChoice) {
+  if (item.options?.length || item.sides?.length || item.includesSoda || item.sodaChoice) {
     openDishDialog(item, itemElement);
     return;
   }
 
-  const selectedOptionIndex = [...itemElement.querySelectorAll(".menu__item-options:not(.menu__side-options):not(.menu__soda-options) .menu__item-option")]
-    .findIndex((optionButton) => optionButton.getAttribute("aria-pressed") === "true");
-  const selectedOption = item.options?.[selectedOptionIndex] ?? item.options?.[0] ?? null;
-  addMenuItemToOrder(item, selectedOption, selectedDishSides.get(item.id) ?? "", selectedDishSodas.get(item.id) ?? "", addButton);
+  addMenuItemToOrder(item, null, selectedDishSides.get(item.id) ?? "", selectedDishSodas.get(item.id) ?? "", addButton);
 });
 
 menuResults.addEventListener("click", (event) => {
