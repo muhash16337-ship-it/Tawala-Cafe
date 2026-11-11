@@ -251,6 +251,23 @@ const MENU_CATEGORY_PHOTOS = Object.freeze({
   }
 });
 
+const MENU_CATEGORY_THUMBNAILS = Object.freeze({
+  "Breakfast & Pastry": "images/menu/breakfast-thumb.webp",
+  "Breakfast Plates": "images/gallery-omelette.jpg",
+  "Hot Drinks": "images/menu/drinks-thumb.webp",
+  "Shawarma & Fries": "images/menu/lunch-thumb.webp",
+  Burgers: "images/menu/burgers.jpg",
+  Fish: "images/menu/fish.jpg",
+  "Wings & Chips": "images/menu/wings-chips.jpg",
+  "Grills & Curry": "images/menu/grills-curry.jpg",
+  Platters: "images/menu/platters.jpg",
+  Desserts: "images/menu/desserts-thumb.webp",
+  "Fresh Juices": "images/menu/juice-thumb.webp",
+  Milkshakes: "images/menu/milkshakes.jpg",
+  Mocktails: "images/menu/mocktails.jpg",
+  "Soda & Water": "images/menu/soda-thumb.webp"
+});
+
 const MENU_CATEGORY_ICONS = Object.freeze({
   "Breakfast & Pastry": ["M3 12h18", "M5 12a7 7 0 0 1 14 0", "M5 16h14"],
   "Breakfast Plates": ["M3 12h18", "M5 12a7 7 0 0 1 14 0", "M5 16h14"],
@@ -1001,7 +1018,8 @@ function requireDishSelections(item, container, messageElement) {
 menuTabs.forEach((tab) => {
   const category = tab.dataset.menuCategory;
   const photo = MENU_CATEGORY_PHOTOS[category];
-  if (!photo) {
+  const thumbnailFile = MENU_CATEGORY_THUMBNAILS[category];
+  if (!photo || !thumbnailFile) {
     return;
   }
 
@@ -1009,17 +1027,21 @@ menuTabs.forEach((tab) => {
   label.textContent = tab.textContent;
   const thumbnail = document.createElement("img");
   thumbnail.className = "menu__tab-thumbnail";
-  thumbnail.src = versionedAssetUrl(photo.file.replace(/\.jpg$/i, "-thumb.webp"));
-  thumbnail.alt = photo.alt;
+  thumbnail.src = versionedAssetUrl(thumbnailFile);
+  thumbnail.alt = category;
   thumbnail.width = 32;
   thumbnail.height = 32;
   thumbnail.loading = "lazy";
   thumbnail.decoding = "async";
   thumbnail.onerror = () => {
-    thumbnail.onerror = () => {
-      thumbnail.hidden = true;
-    };
-    thumbnail.src = versionedAssetUrl(photo.file);
+    if (/-thumb\.webp$/i.test(thumbnailFile)) {
+      thumbnail.onerror = () => {
+        thumbnail.hidden = true;
+      };
+      thumbnail.src = versionedAssetUrl(thumbnailFile.replace(/-thumb\.webp$/i, ".jpg"));
+      return;
+    }
+    thumbnail.hidden = true;
   };
   tab.replaceChildren(thumbnail, label);
 });

@@ -1951,10 +1951,6 @@ button:focus-visible {
 }
 
 @media (max-width: 767px) {
-  .menu__tab-thumbnail {
-    display: none;
-  }
-
   .menu__category-header {
     position: relative;
     display: flex;
