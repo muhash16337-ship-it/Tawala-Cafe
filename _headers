@@ -12,3 +12,7 @@
 
 /*
   Cache-Control: public, max-age=0, must-revalidate
+
+/images/categories/*
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate

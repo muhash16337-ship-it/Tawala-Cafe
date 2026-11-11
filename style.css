@@ -1672,11 +1672,12 @@ button:focus-visible {
 
 .menu__tab {
   display: inline-flex;
-  min-height: 2.75rem;
+  min-height: 3.25rem;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 1rem;
+  gap: 0.55rem;
+  padding: 0.35rem 0.85rem;
   border: 1px solid rgb(201 162 74 / 62%);
   border-radius: 999px;
   background: transparent;
@@ -1691,12 +1692,13 @@ button:focus-visible {
 }
 
 .menu__tab-thumbnail {
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   flex: 0 0 auto;
   border: 1px solid rgb(201 162 74 / 62%);
   border-radius: 50%;
   object-fit: cover;
+  vertical-align: middle;
 }
 
 .menu__tab-thumbnail[hidden] {
@@ -1786,24 +1788,11 @@ button:focus-visible {
   }
 
   .menu__tabs {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    gap: 0.5rem;
-    margin-right: -1.25rem;
-    margin-left: -1.25rem;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-padding-inline: 1.25rem;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-
-  .menu__tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .menu__tab {
-    scroll-snap-align: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-right: -0.75rem;
+    margin-left: -0.75rem;
   }
 }
 

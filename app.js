@@ -252,20 +252,20 @@ const MENU_CATEGORY_PHOTOS = Object.freeze({
 });
 
 const MENU_CATEGORY_THUMBNAILS = Object.freeze({
-  "Breakfast & Pastry": "images/menu/breakfast-thumb.webp",
-  "Breakfast Plates": "images/gallery-omelette.jpg",
-  "Hot Drinks": "images/menu/drinks-thumb.webp",
-  "Shawarma & Fries": "images/menu/lunch-thumb.webp",
-  Burgers: "images/menu/burgers.jpg",
-  Fish: "images/menu/fish.jpg",
-  "Wings & Chips": "images/menu/wings-chips.jpg",
-  "Grills & Curry": "images/menu/grills-curry.jpg",
-  Platters: "images/menu/platters.jpg",
-  Desserts: "images/menu/desserts-thumb.webp",
-  "Fresh Juices": "images/menu/juice-thumb.webp",
-  Milkshakes: "images/menu/milkshakes.jpg",
-  Mocktails: "images/menu/mocktails.jpg",
-  "Soda & Water": "images/menu/soda-thumb.webp"
+  "breakfast-pastry": "images/categories/breakfast-pastry.webp?v=3",
+  "breakfast-plates": "images/categories/breakfast-plates.webp?v=3",
+  "hot-drinks": "images/categories/hot-drinks.webp?v=3",
+  "shawarma-fries": "images/categories/shawarma-fries.webp?v=3",
+  burgers: "images/categories/burgers.webp?v=3",
+  fish: "images/categories/fish.webp?v=3",
+  "wings-chips": "images/categories/wings-chips.webp?v=3",
+  "grills-curry": "images/categories/grills-curry.webp?v=3",
+  platters: "images/categories/platters.webp?v=3",
+  desserts: "images/categories/desserts.webp?v=3",
+  "fresh-juices": "images/categories/fresh-juices.webp?v=3",
+  milkshakes: "images/categories/milkshakes.webp?v=3",
+  mocktails: "images/categories/mocktails.webp?v=3",
+  "soda-water": "images/categories/soda-water.webp?v=3"
 });
 
 const MENU_CATEGORY_ICONS = Object.freeze({
@@ -1017,9 +1017,8 @@ function requireDishSelections(item, container, messageElement) {
 
 menuTabs.forEach((tab) => {
   const category = tab.dataset.menuCategory;
-  const photo = MENU_CATEGORY_PHOTOS[category];
-  const thumbnailFile = MENU_CATEGORY_THUMBNAILS[category];
-  if (!photo || !thumbnailFile) {
+  const thumbnailPath = MENU_CATEGORY_THUMBNAILS[tab.dataset.menuCategoryId];
+  if (!thumbnailPath) {
     return;
   }
 
@@ -1027,22 +1026,12 @@ menuTabs.forEach((tab) => {
   label.textContent = tab.textContent;
   const thumbnail = document.createElement("img");
   thumbnail.className = "menu__tab-thumbnail";
-  thumbnail.src = versionedAssetUrl(thumbnailFile);
+  thumbnail.src = thumbnailPath;
   thumbnail.alt = category;
-  thumbnail.width = 32;
-  thumbnail.height = 32;
+  thumbnail.width = 36;
+  thumbnail.height = 36;
   thumbnail.loading = "lazy";
   thumbnail.decoding = "async";
-  thumbnail.onerror = () => {
-    if (/-thumb\.webp$/i.test(thumbnailFile)) {
-      thumbnail.onerror = () => {
-        thumbnail.hidden = true;
-      };
-      thumbnail.src = versionedAssetUrl(thumbnailFile.replace(/-thumb\.webp$/i, ".jpg"));
-      return;
-    }
-    thumbnail.hidden = true;
-  };
   tab.replaceChildren(thumbnail, label);
 });
 
