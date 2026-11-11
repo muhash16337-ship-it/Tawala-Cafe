@@ -136,119 +136,38 @@ const menuItems = [
   { id: "water", name: "Water", description: "", category: "Soda & Water", price: 70, options: [{ label: "500ml", price: 70 }, { label: "1L", price: 120 }], image: null, popular: false, available: true }
 ];
 
-const MENU_CATEGORY_PHOTOS = Object.freeze({
-  "Breakfast & Pastry": {
-    file: "images/menu/breakfast.jpg",
-    alt: "Full English style breakfast plate at Tawala Café",
-    focus: "50% 40%",
-    width: 736,
-    height: 981,
-    subtitle: "A generous start to the day."
-  },
-  "Breakfast Plates": {
-    file: "images/menu/breakfast.jpg",
-    alt: "Breakfast plate at Tawala Café",
-    focus: "50% 40%",
-    width: 736,
-    height: 981,
-    subtitle: "Classic plates to start your day."
-  },
-  "Hot Drinks": {
-    file: "images/menu/drinks.jpg",
-    alt: "Cappuccino with latte art at Tawala Café",
-    focus: "50% 42%",
-    width: 736,
-    height: 1104,
-    subtitle: "Coffee, tea and something warm."
-  },
-  "Shawarma & Fries": {
-    file: "images/menu/lunch.jpg",
-    alt: "Shawarma wrap at Tawala Café",
-    focus: "50% 42%",
-    width: 673,
-    height: 1200,
-    subtitle: "Golden fries and freshly made shawarma."
-  },
-  Burgers: {
-    file: "images/menu/lunch.jpg",
-    alt: "Burger meal at Tawala Café",
-    focus: "50% 42%",
-    width: 673,
-    height: 1200,
-    subtitle: "Freshly made favourites from the grill."
-  },
-  Fish: {
-    file: "images/menu/lunch.jpg",
-    alt: "Fish meal at Tawala Café",
-    focus: "50% 42%",
-    width: 673,
-    height: 1200,
-    subtitle: "Fish dishes served with your choice of side."
-  },
-  "Wings & Chips": {
-    file: "images/menu/lunch.jpg",
-    alt: "Wings and chips at Tawala Café",
-    focus: "50% 42%",
-    width: 673,
-    height: 1200,
-    subtitle: "Wings, chips and shareable favourites."
-  },
-  "Grills & Curry": {
-    file: "images/menu/lunch.jpg",
-    alt: "Grilled meal at Tawala Café",
-    focus: "50% 42%",
-    width: 673,
-    height: 1200,
-    subtitle: "From the grill and kitchen, made to order."
-  },
-  Platters: {
-    file: "images/menu/lunch.jpg",
-    alt: "Sharing platter at Tawala Café",
-    focus: "50% 42%",
-    width: 673,
-    height: 1200,
-    subtitle: "Generous platters made for sharing."
-  },
-  Desserts: {
-    file: "images/menu/desserts.jpg",
-    alt: "Ice cream sundae dessert at Tawala Café",
-    focus: "50% 42%",
-    width: 736,
-    height: 1308,
-    subtitle: "A sweet finish to your meal."
-  },
-  "Fresh Juices": {
-    file: "images/menu/juice.jpg",
-    alt: "Fresh orange juice at Tawala Café",
-    focus: "50% 42%",
-    width: 810,
-    height: 1440,
-    subtitle: "Fresh, fruity and made to refresh."
-  },
-  Milkshakes: {
-    file: "images/menu/juice.jpg",
-    alt: "Milkshake at Tawala Café",
-    focus: "50% 42%",
-    width: 810,
-    height: 1440,
-    subtitle: "Creamy milkshakes in classic flavours."
-  },
-  Mocktails: {
-    file: "images/menu/juice.jpg",
-    alt: "Refreshing mocktail at Tawala Café",
-    focus: "50% 42%",
-    width: 810,
-    height: 1440,
-    subtitle: "Cool, refreshing drinks with a twist."
-  },
-  "Soda & Water": {
-    file: "images/menu/soda.jpg",
-    alt: "Cold sodas with ice at Tawala Café",
-    focus: "50% 42%",
-    width: 736,
-    height: 1104,
-    subtitle: "Something cool to go with it."
-  }
+const MENU_CATEGORY_HEADER_IMAGES = Object.freeze({
+  "breakfast-pastry": "images/headers/breakfast-pastry.webp?v=4",
+  "breakfast-plates": "images/headers/breakfast-plates.webp?v=4",
+  "hot-drinks": "images/headers/hot-drinks.webp?v=4",
+  "shawarma-fries": "images/headers/shawarma-fries.webp?v=4",
+  burgers: "images/headers/burgers.webp?v=4",
+  fish: "images/headers/fish.webp?v=4",
+  "wings-chips": "images/headers/wings-chips.webp?v=4",
+  "grills-curry": "images/headers/grills-curry.webp?v=4",
+  platters: "images/headers/platters.webp?v=4",
+  desserts: "images/headers/desserts.webp?v=4",
+  "fresh-juices": "images/headers/fresh-juices.webp?v=4",
+  milkshakes: "images/headers/milkshakes.webp?v=4",
+  mocktails: "images/headers/mocktails.webp?v=4",
+  "soda-water": "images/headers/soda-water.webp?v=4"
+});
+
+const MENU_CATEGORY_SUBTITLES = Object.freeze({
+  "Breakfast & Pastry": "A generous start to the day.",
+  "Breakfast Plates": "Classic plates to start your day.",
+  "Hot Drinks": "Coffee, tea and something warm.",
+  "Shawarma & Fries": "Golden fries and freshly made shawarma.",
+  Burgers: "Freshly made favourites from the grill.",
+  Fish: "Fish dishes served with your choice of side.",
+  "Wings & Chips": "Wings, chips and shareable favourites.",
+  "Grills & Curry": "From the grill and kitchen, made to order.",
+  Platters: "Generous platters made for sharing.",
+  Desserts: "A sweet finish to your meal.",
+  "Fresh Juices": "Fresh, fruity and made to refresh.",
+  Milkshakes: "Creamy milkshakes in classic flavours.",
+  Mocktails: "Cool, refreshing drinks with a twist.",
+  "Soda & Water": "Something cool to go with it."
 });
 
 const MENU_CATEGORY_THUMBNAILS = Object.freeze({
@@ -1035,39 +954,35 @@ menuTabs.forEach((tab) => {
   tab.replaceChildren(thumbnail, label);
 });
 
-function createMenuCategoryPhoto(category, photo) {
+function createMenuCategoryPhoto(category, imagePath) {
   const figure = document.createElement("figure");
   figure.className = "menu__category-photo";
   figure.dataset.menuCategoryPhoto = category;
 
   const picture = document.createElement("picture");
   picture.className = "menu__category-picture";
-  const source = document.createElement("source");
-  source.type = "image/webp";
-  source.srcset = versionedAssetUrl(photo.file.replace(/\.jpg$/i, ".webp"));
-
-  const image = document.createElement("img");
-  image.src = versionedAssetUrl(photo.file);
-  image.alt = photo.alt;
-  image.width = photo.width;
-  image.height = photo.height;
-  image.loading = "lazy";
-  image.decoding = "async";
-  image.style.objectPosition = photo.focus;
-  image.onerror = () => {
-    if (picture.querySelector("source")) {
-      picture.querySelector("source").remove();
-      return;
-    }
-
+  const showFallback = (alt) => {
     const fallback = document.createElement("span");
     fallback.className = "menu__category-photo-fallback";
     fallback.textContent = category;
     fallback.setAttribute("role", "img");
-    fallback.setAttribute("aria-label", photo.alt);
+    fallback.setAttribute("aria-label", alt);
     picture.replaceChildren(fallback);
   };
-  picture.append(source, image);
+
+  if (imagePath) {
+    const image = document.createElement("img");
+    image.src = imagePath;
+    image.alt = `${category} at Tawala Café`;
+    image.width = 900;
+    image.height = 1200;
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.onerror = () => showFallback(image.alt);
+    picture.append(image);
+  } else {
+    showFallback(`${category} menu photo unavailable`);
+  }
 
   const label = document.createElement("figcaption");
   label.className = "menu__category-photo-label";
@@ -1229,7 +1144,8 @@ function renderMenuItems(items) {
     heading.className = "menu__category-heading";
     heading.textContent = category;
 
-    const photo = MENU_CATEGORY_PHOTOS[category];
+    const categoryTab = Array.from(menuTabs).find((tab) => tab.dataset.menuCategory === category);
+    const imagePath = MENU_CATEGORY_HEADER_IMAGES[categoryTab?.dataset.menuCategoryId];
     const categoryHeader = document.createElement("header");
     categoryHeader.className = "menu__category-header";
     const categoryCopy = document.createElement("div");
@@ -1241,12 +1157,12 @@ function renderMenuItems(items) {
 
     const subtitle = document.createElement("p");
     subtitle.className = "menu__category-subtitle";
-    subtitle.textContent = photo.subtitle;
+    subtitle.textContent = MENU_CATEGORY_SUBTITLES[category];
     const dishCount = document.createElement("p");
     dishCount.className = "menu__category-count";
     dishCount.textContent = `${categoryItems.length} ${categoryItems.length === 1 ? "dish" : "dishes"}`;
     categoryCopy.append(subtitle, dishCount);
-    categoryHeader.append(categoryCopy, createMenuCategoryPhoto(category, photo));
+    categoryHeader.append(categoryCopy, createMenuCategoryPhoto(category, imagePath));
 
     const list = document.createElement("ul");
     list.className = "menu__items";
